@@ -1,5 +1,12 @@
 const request = require('supertest');
 const app = require('../app');
+const db = require('../src/database');
+
+// 安全閥：測試只能使用記憶體資料庫，避免寫入開發用的 database.sqlite。
+// 記憶體資料庫由 vitest.config.js 的 test.env.DB_PATH 設定。
+if (!db.memory) {
+  throw new Error('測試必須使用記憶體資料庫（DB_PATH=:memory:），拒絕在實體資料庫上執行');
+}
 
 /**
  * Login with the seed admin account and return the JWT token.

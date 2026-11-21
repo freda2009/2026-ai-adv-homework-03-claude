@@ -3,7 +3,12 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 
-const dbPath = path.join(__dirname, '..', 'database.sqlite');
+// DB_PATH: ':memory:' 使用記憶體資料庫（測試用）；相對路徑以專案根目錄解析；
+// 未設定時使用專案根目錄的 database.sqlite。
+const projectRoot = path.join(__dirname, '..');
+const dbPath = process.env.DB_PATH === ':memory:'
+  ? ':memory:'
+  : path.resolve(projectRoot, process.env.DB_PATH || 'database.sqlite');
 const db = new Database(dbPath);
 
 // Enable WAL mode for better performance
