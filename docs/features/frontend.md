@@ -19,12 +19,13 @@
 - `requireAuth()`：未登入導向 `/login?redirect=<目前路徑>`；`requireAdmin()`：非管理員導向 `/login`。
 
 **`apiFetch(url, options)`（`api.js`）**：自動加 `Content-Type: application/json` 與 `Auth.getAuthHeaders()`。
-- 回應 401：清除 localStorage、導向 `/login`、回傳 `undefined`。
+- 回應 401（登入過期）：清除 localStorage、導向 `/login`、回傳 `undefined`；已在 `/login` 頁時只清除、不重複導向。
+- **例外**：對 `/api/auth/login`、`/api/auth/register` 的 401 是「帳密錯誤」，不清除、不導向，照一般錯誤 `throw { status, data }`，由 `login.js` 顯示 `err.data.message`（比對時忽略查詢字串）。
 - 非 2xx：`throw { status, data }`（`data` 為伺服器回應 JSON，頁面用 `err.data.message` 顯示）。
 
 **`Notification.show(message, type)`（`notification.js`）**：`success`｜`error`｜`warning`｜`info`，3 秒後淡出；需要 `partials/notification.ejs` 的 `#notification-toast`。
 
-**`header-init.js`**（僅前台）：依登入狀態渲染 `#auth-nav`（管理員多一個「後台管理」連結）、顯示「我的訂單」連結、以 `/api/cart` 項目數更新 `#cart-badge`。
+**`header-init.js`**（僅前台）：依登入狀態渲染 `#auth-nav`（管理員多一個「後台管理」連結）、顯示「我的訂單」連結、以 `/api/cart` 項目數更新 `#cart-badge`。節點以 `createElement`＋`textContent`＋`replaceChildren` 建立，不使用 `innerHTML`，使用者名稱不會被當成 HTML 解析。
 
 ## 頁面行為重點
 
@@ -41,6 +42,6 @@
 
 ## 已知陷阱
 
-- `apiFetch` 對**任何** 401 都會導向 `/login`，包含登入頁輸入錯誤密碼的情況：頁面會被重新載入，`login.js` 的錯誤提示來不及顯示（依程式碼推論，未實測）。
-- `header-init.js` 用 `innerHTML` 插入 `user.name`（來自 localStorage，未跳脫）；名稱只顯示給本人，但新增類似功能時應改用 `textContent`。
+- 新增「帳密驗證型」的端點（回 401 但不代表登入過期）時，要比照登入／註冊，把它加進 `api.js` 的 `isCredentialRequest` 判斷，否則會被導向 `/login`。
+- 前端腳本沒有瀏覽器測試環境；`tests/apiFetch.test.js`、`tests/headerInit.test.js` 以 Node `vm` 注入假的 DOM 與 `fetch` 驗證邏輯，不等於瀏覽器實機驗證。
 - Tailwind 的自訂色（`rose-primary`、`sage`、`apricot`、`cream` 等）定義在 `public/css/input.css` 的 `@theme`；新增樣式後必須重新 `npm run css:build`（或開 `dev:css`）。

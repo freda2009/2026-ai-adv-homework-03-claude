@@ -19,6 +19,10 @@
 | `orders.test.js` | 6 | 建立訂單、空購物車 400、未登入 401、列表、詳情、不存在 404 |
 | `adminProducts.test.js` | 6 | 列表、新增、更新、刪除（並確認 404）、一般使用者 403、無 token 401 |
 | `adminOrders.test.js` | 4 | 列表、`status` 篩選、詳情、一般使用者 403 |
+| `apiFetch.test.js` | 6 | 前端 `api.js`：登入／註冊 401 不導向、登入過期 401 清除並導向、已在 `/login` 不重複導向、其他錯誤碼 |
+| `headerInit.test.js` | 7 | 前端 `header-init.js`：不含 `innerHTML`、名稱含 HTML 只當純文字、管理員連結、登出、徽章 |
+
+`apiFetch.test.js`、`headerInit.test.js` 是前端測試：不使用 `tests/setup.js`，改用 Node `vm` 載入 `public/js/*.js` 並注入假的 `Auth`／`fetch`／`document`，不需要資料庫。它們驗證邏輯，不等於瀏覽器實機驗證。
 
 尚未涵蓋：`PATCH /api/orders/:id/pay`、註冊與商品欄位驗證錯誤、`STOCK_INSUFFICIENT`、購物車登入模式的改／刪、頁面路由、`errorHandler`。
 

@@ -4,6 +4,12 @@
 
 ## 2026-11-21
 
+### 修正
+- `apiFetch`：登入／註冊的 401（帳密錯誤）不再清除登入資料並導向 `/login`，改為丟出錯誤讓登入頁顯示訊息；已在 `/login` 頁時其他 401 不再重複導向。
+- `header-init.js`：改用 DOM API 與 `textContent` 建立導覽列，前端不再有任何 `innerHTML`，使用者名稱不會被當成 HTML 解析。
+- 新增 `tests/apiFetch.test.js`、`tests/headerInit.test.js`（共 13 個測試，以 Node `vm` 注入假 DOM）。
+- 計畫：[frontend-401-and-xss-fixes](./plans/archive/2026-11-21-frontend-401-and-xss-fixes.md)
+
 ### 測試
 - 測試改用記憶體資料庫：`src/database.js` 新增 `DB_PATH` 環境變數，`vitest.config.js` 的 `test.env` 設為 `:memory:`，並提供測試用的 `JWT_SECRET` 與管理員帳密。測試不再讀寫 `database.sqlite`、不再消耗庫存，也不需要 `.env`。
 - `tests/setup.js` 新增安全閥：資料庫不是記憶體資料庫時中止測試。

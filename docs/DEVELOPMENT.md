@@ -76,7 +76,7 @@
 ## 安全注意事項
 - 一律參數化 SQL；動態欄位名只能來自程式內固定值。
 - 不要在回應或日誌輸出 `password_hash`、token、`.env` 內容。
-- 輸出使用者內容時用 `{{ }}`／`textContent`；`header-init.js` 的 `innerHTML` 是已知例外。
+- 輸出使用者內容時用 `{{ }}`／`textContent`；前端目前沒有任何 `innerHTML`／`v-html`，`tests/headerInit.test.js` 會檢查 `header-init.js` 不含 `innerHTML`。
 
 ## 計畫歸檔流程
 
