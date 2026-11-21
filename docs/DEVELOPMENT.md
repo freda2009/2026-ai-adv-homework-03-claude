@@ -86,6 +86,6 @@
    - 填寫「執行結果」：實際變更、與計畫差異、測試結果、遺留事項
    - 狀態改為「已完成」並填完成日期
    - 更新 docs/FEATURES.md 和 docs/CHANGELOG.md
-5. 歸檔：`mv docs/plans/<檔名>.md docs/plans/archive/<檔名>.md`（本專案不是 git 專案；若日後 `git init` 改用 `git mv`）
+5. 歸檔：`git mv docs/plans/<檔名>.md docs/plans/archive/<檔名>.md`
 6. 放棄的計畫：狀態改為「已放棄」並寫明原因，同樣移至 docs/plans/archive/
 7. 每份計畫不超過 500 行（目標 100 行內）；過大的功能拆成多份計畫
