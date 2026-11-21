@@ -32,7 +32,10 @@
 | `ADMIN_EMAIL`／`ADMIN_PASSWORD` | 管理員 seed 帳密 | 否 | `admin@hexschool.com`／`12345678` |
 | `DB_PATH` | 資料庫路徑；`:memory:` 為記憶體資料庫；相對路徑以專案根目錄解析 | 否 | `database.sqlite`（測試由 `vitest.config.js` 設為 `:memory:`） |
 | `NODE_ENV` | `test` 時管理員 seed 的 bcrypt cost 為 1 | 否 | 未設 |
-| `BASE_URL`、`ECPAY_*` | 範例檔列出，**程式碼未使用** | 否 | — |
+| `BASE_URL` | 本站對外網址，用於綠界的 `OrderResultURL`、`ClientBackURL` | 否 | `http://localhost:<PORT>` |
+| `ECPAY_MERCHANT_ID`／`ECPAY_HASH_KEY`／`ECPAY_HASH_IV` | 綠界商店代號與金鑰（範例檔為公開測試值）；只放環境變數 | 付款時必要 | 無（缺少時付款端點回 503） |
+| `ECPAY_ENV` | `production` 才連正式環境，其他值一律使用測試環境 | 否 | `staging` |
+| `ECPAY_RETURN_URL` | 綠界必填的 ReturnURL；本機收不到 Server Notify，不需設定 | 否 | `${BASE_URL}/api/ecpay/notify` |
 
 `.env.example` 的 `FRONTEND_URL` 是 `http://localhost:5173`，與程式預設不同；前端由同一個 Express 提供時不需要改。
 

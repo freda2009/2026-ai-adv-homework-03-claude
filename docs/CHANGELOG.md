@@ -4,6 +4,16 @@
 
 ## 2026-11-21
 
+### 新功能：綠界 ECPay 付款
+- 新增 `src/services/ecpay.js`（CheckMacValue、付款表單欄位、QueryTradeInfo 查詢）與 `src/routes/ecpayRoutes.js`：`POST /api/orders/:id/ecpay/checkout` 建立付款、`POST /api/orders/:id/ecpay/verify` 由後端主動查詢綠界並在驗證通過後把訂單改為 `paid`（取代本機收不到的 Server Notify）。
+- 新增 `payments` 資料表（付款嘗試）；新增 `POST /ecpay/return`（只轉址、不改狀態）。
+- **移除**模擬付款端點 `PATCH /api/orders/:id/pay` 與前端「付款成功／失敗」按鈕：原本任何登入者都能把自己的訂單直接改成已付款。
+- 訂單詳情頁改為「前往綠界付款」與「重新查詢付款結果」，且不再信任網址的 `?payment=` 顯示成功。
+- 新增 `.env.example` 的 `ECPAY_RETURN_URL`、`DB_PATH` 說明；綠界 ECPay skill 以 git submodule 引用到 `.claude/skills/ecpay`（授權為 All Rights Reserved、禁止重新散布，所以只記錄指標、不複製內容）。
+- 測試 +56（`ecpay` 24、`payments` 23、`orderDetailPage` 9），總計 101 個，綠界一律 mock。
+- 對綠界測試環境的實測結果與尚未驗證的項目見 [features/payment-ecpay.md](./features/payment-ecpay.md)。
+- 計畫：[ecpay-payment](./plans/2026-11-21-ecpay-payment.md)
+
 ### 修正
 - `apiFetch`：登入／註冊的 401（帳密錯誤）不再清除登入資料並導向 `/login`，改為丟出錯誤讓登入頁顯示訊息；已在 `/login` 頁時其他 401 不再重複導向。
 - `header-init.js`：改用 DOM API 與 `textContent` 建立導覽列，前端不再有任何 `innerHTML`，使用者名稱不會被當成 HTML 解析。

@@ -21,6 +21,7 @@ npm test                 # vitest run（使用記憶體資料庫，不碰 databa
 - 新增或修改路由時，同步更新該檔的 `@openapi` JSDoc 註解。
 - 後端是 CommonJS（`require`／`module.exports`）；前端是 Vue 3 CDN，沒有打包流程。
 - 金額（`price`、`total_amount`）一律是整數，不使用小數。
+- 訂單只能由後端呼叫綠界 QueryTradeInfo、驗證通過（CheckMacValue、MerchantTradeNo、金額、`TradeStatus=1`）後變成 `paid`；不信任瀏覽器帶回的付款結果，不新增繞過驗證的付款端點（見 docs/features/payment-ecpay.md）。
 - 功能開發先複製 docs/plans/_template.md 建立計畫；完成後填寫「執行結果」並移至 docs/plans/archive/。
 
 ## 詳細文件
@@ -34,7 +35,7 @@ npm test                 # vitest run（使用記憶體資料庫，不碰 databa
 - ./docs/plans/ — 開發計畫（完成後移至 archive/）
 
 ## 必要遵守項目
-- 不要讀取、輸出或提交 `.env`；機密只放 `.env`，範例值放 `.env.example`。
+- 不要讀取、輸出或提交 `.env`；機密只放 `.env`，範例值放 `.env.example`。綠界 HashKey／HashIV 只讀環境變數，不寫進程式碼。
 - 測試必須使用記憶體資料庫（`vitest.config.js` 的 `DB_PATH=:memory:`，`tests/setup.js` 有安全閥）；不要移除這個設定，也不要讓測試連到 `database.sqlite`。
 - 受保護的路由必須掛 `authMiddleware`；後台路由再加 `adminMiddleware`（兩者順序不可對調）。
 - 前端渲染使用者資料用 `{{ }}` 或 `textContent`；避免 `innerHTML`／`v-html` 插入未跳脫內容。

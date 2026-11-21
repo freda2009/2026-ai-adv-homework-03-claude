@@ -20,8 +20,8 @@ tools:
 5. **密碼**：bcrypt cost、`password_hash` 是否可能被任何查詢回傳（注意 `SELECT *` 的使用位置）。
 6. **XSS**：EJS `<%- %>`、Vue `v-html`、`innerHTML`、`document.write`；目前前端應該沒有任何一處，若 `grep` 發現新增，評估資料來源是否可被他人控制。
 7. **CORS 與錯誤處理**：`cors` 的 `origin`；`errorHandler` 是否洩漏內部訊息；有無未處理的例外路徑回傳堆疊。
-8. **機密與檔案**：`.gitignore` 是否涵蓋 `.env`、`database.sqlite*`；程式碼中有無寫死的密鑰；`.env.example` 的 `ECPAY_*` 值是否為公開測試值（與程式未使用的事實一併回報）。
-9. **業務邏輯濫用**：數量／價格的型別與範圍、庫存競態、模擬付款端點是否能被任意使用者對自己的訂單呼叫（目前設計如此，說明風險）、登入沒有速率限制。
+8. **機密與檔案**：`.gitignore` 是否涵蓋 `.env`、`database.sqlite*`；程式碼中有無寫死的密鑰；`.env.example` 的 `ECPAY_*` 值是否為綠界公開測試值（`3002607`），且正式金鑰沒有出現在任何被追蹤的檔案或日誌中。
+9. **業務邏輯濫用**：數量／價格的型別與範圍、庫存競態、登入沒有速率限制。**付款**：確認沒有任何端點能繞過 `ecpayRoutes.js` 的 `checkAttempt` 把訂單改成 `paid`（`grep -rn "status = 'paid'" src`，應只有 `markPaid` 這個 transaction）；verify 是否同時檢查 CheckMacValue（timing-safe）、`MerchantTradeNo`、金額與 `TradeStatus`；`POST /ecpay/return` 與前端 `?payment=` 是否仍然不改狀態、不被信任；查詢是否有 10 秒限流。
 10. **相依套件**：必要時執行 `npm audit --omit=dev` 並摘要結果（需要網路，沙箱可能阻擋）。
 
 ## 輸出格式

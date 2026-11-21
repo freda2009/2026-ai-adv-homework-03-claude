@@ -36,7 +36,7 @@
 | 購物車 | 修改數量呼叫 PATCH；結帳前未登入導向 `/login?redirect=/checkout` |
 | 結帳 | `Auth.requireAuth()`；購物車為空就導回 `/cart`；成功後導向 `/orders/<id>` |
 | 登入 | 登入／註冊兩個分頁；成功後導向 `?redirect=` 或 `/` |
-| 訂單詳情 | 模擬付款按鈕呼叫 `PATCH /api/orders/:id/pay` |
+| 訂單詳情 | 「前往綠界付款」呼叫 checkout 並以 `createElement` 建隱藏表單全頁 POST 到綠界；「重新查詢付款結果」呼叫 verify。`?payment=checking` 時載入後自動查詢；網址上其他 `payment` 值一律忽略（結果以後端為準） |
 | 後台商品 | 列表、新增／編輯 modal、刪除確認 |
 | 後台訂單 | 狀態篩選、分頁、詳情 modal |
 

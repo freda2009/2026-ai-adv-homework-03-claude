@@ -24,6 +24,7 @@ tools:
 - **資料一致性**：多步驟寫入包在 `db.transaction`；庫存檢查與扣除；訂單明細保留 `product_name`／`product_price` 快照。
 - **驗證**：必填 → 格式 → 存在 → 業務規則的順序；數值用 `Number.isInteger`；分頁 `limit` 限制 1–100。
 - **洩漏**：回應或日誌沒有 `password_hash`、token、內部錯誤細節。
+- **付款**：訂單變成 `paid` 只能發生在 `ecpayRoutes.js` 的 `checkAttempt`（verify 與 checkout 舊交易檢查共用），且已通過查詢驗證（CheckMacValue、MerchantTradeNo、金額、`TradeStatus === '1'`）；沒有信任 request body、網址參數或瀏覽器導回的內容；綠界查詢有限流與錯誤處理。
 - **@openapi**：新增／修改端點有註解且與實作一致。
 - **前端**：用 `apiFetch`、`Notification`；沒有新增未跳脫的 `innerHTML`／`v-html`；新 Tailwind class 已重新建置。
 - **命名與慣例**：`snake_case` 欄位、`camelCase` 請求 body（沿用該資源既有寫法）、錯誤碼 `UPPER_SNAKE_CASE`。

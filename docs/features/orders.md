@@ -27,14 +27,11 @@ Body 必填：`recipientName`、`recipientEmail`、`recipientAddress`。
 ## GET `/api/orders/:id`
 回傳訂單所有欄位加 `items`（`order_items` 全欄位）。不存在或不屬於自己回 404 `訂單不存在`。
 
-## PATCH `/api/orders/:id/pay` 模擬付款
-- Body：`action` 必須是 `success`（→ `paid`）或 `fail`（→ `failed`），否則 400 `VALIDATION_ERROR`。
-- 訂單不存在／不屬於自己 → 404。
-- 訂單狀態不是 `pending` → 400 `INVALID_STATUS`（已付款或已失敗都不能再付款）。
-- 成功回傳更新後的訂單加 `items`；message 為 `付款成功` 或 `付款失敗`。
+## 付款
+付款走綠界：`POST /api/orders/:id/ecpay/checkout` 建立付款、`POST /api/orders/:id/ecpay/verify` 由後端呼叫綠界查詢並更新訂單狀態。完整流程、驗證規則與限制見 [payment-ecpay.md](./payment-ecpay.md)。
+舊的模擬付款端點 `PATCH /api/orders/:id/pay` 已移除：訂單只能由綠界查詢驗證後變成 `paid`。
 
 ## 已知行為與限制
-- 付款失敗不會還原庫存，也沒有重新付款流程；失敗的訂單只是留在 `failed` 狀態。
-- 沒有取消訂單端點。
-- `.env.example` 含 `ECPAY_*`、`BASE_URL`，但程式碼沒有使用，付款完全是模擬。
-- 前端 `/orders/:id?payment=success|failed|cancel` 只是用來顯示提示橫幅，不代表實際付款結果。
+- 訂單狀態 `pending → paid` 只由綠界查詢驗證觸發（verify，或 checkout 時對舊交易的檢查）；`failed` 狀態目前沒有任何流程會設定（綠界「交易未成立」只讓該筆付款交易失敗，訂單仍是 `pending`，可重新付款）。
+- 付款不成功不會還原庫存，也沒有取消訂單端點。
+- 前端 `/orders/:id?payment=checking` 只用來決定「是否自動向後端查詢」，不信任網址上的其他值。

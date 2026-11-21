@@ -9,7 +9,8 @@
 | `/api/auth` | `authRoutes.js` | 僅 `/profile` 需要 Bearer | 註冊、登入、個人資料 |
 | `/api/products` | `productRoutes.js` | 無 | 公開商品列表與詳情 |
 | `/api/cart` | `cartRoutes.js` | 雙模式（Bearer 或 `X-Session-Id`） | 購物車 |
-| `/api/orders` | `orderRoutes.js` | Bearer（`router.use(authMiddleware)`） | 自己的訂單、建立、模擬付款 |
+| `/api/orders` | `orderRoutes.js` | Bearer（`router.use(authMiddleware)`） | 自己的訂單、建立 |
+| `/api/orders/:id/ecpay` | `ecpayRoutes.js` | Bearer（每個端點各自掛 `authMiddleware`） | 綠界付款：建立交易、查詢驗證 |
 | `/api/admin/products` | `adminProductRoutes.js` | Bearer + admin | 後台商品 CRUD |
 | `/api/admin/orders` | `adminOrderRoutes.js` | Bearer + admin | 後台訂單查詢 |
 
@@ -29,7 +30,8 @@
 | POST | `/api/orders` | 201 | 由購物車建立訂單 |
 | GET | `/api/orders` | 200 | 自己的訂單列表（無分頁） |
 | GET | `/api/orders/:id` | 200 | 自己的訂單詳情（含 items） |
-| PATCH | `/api/orders/:id/pay` | 200 | 模擬付款，body `{ action: "success" \| "fail" }` |
+| POST | `/api/orders/:id/ecpay/checkout` | 201 | 建立綠界付款交易，回傳要 POST 到綠界的 `{ action, method, fields }` |
+| POST | `/api/orders/:id/ecpay/verify` | 200 | 後端呼叫綠界 QueryTradeInfo 驗證並更新訂單；`data.result` 為 `paid`／`pending`／`failed` |
 | GET | `/api/admin/products` | 200 | 後台商品列表（分頁同公開） |
 | POST | `/api/admin/products` | 201 | 新增商品 |
 | PUT | `/api/admin/products/:id` | 200 | 部分更新商品 |
@@ -47,7 +49,8 @@
 | `/checkout` | front | `checkout` | 結帳（需登入） |
 | `/login` | front | `login` | 登入／註冊分頁，支援 `?redirect=` |
 | `/orders` | front | `orders` | 我的訂單（需登入） |
-| `/orders/:id` | front | `order-detail` | 訂單詳情與模擬付款；`?payment=` 傳入 `paymentResult` |
+| `/orders/:id` | front | `order-detail` | 訂單詳情與綠界付款；`?payment=checking` 時自動向後端查詢（`paymentResult` 只用於此） |
+| `/ecpay/return`（POST） | — | — | 綠界付款後瀏覽器導回（`OrderResultURL`）：只用 `MerchantTradeNo` 找出訂單並 303 轉址，不改狀態 |
 | `/admin/products` | admin | `admin-products` | 商品管理 |
 | `/admin/orders` | admin | `admin-orders` | 訂單管理 |
 

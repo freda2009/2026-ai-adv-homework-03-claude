@@ -1,6 +1,6 @@
 # 作業1:花漾生活 Flower Life
 
-花卉電商示範專案：訪客可瀏覽商品、加入購物車；登入後可結帳、模擬付款；管理員可管理商品與查看訂單。
+花卉電商示範專案：訪客可瀏覽商品、加入購物車；登入後可結帳並以綠界（ECPay）付款；管理員可管理商品與查看訂單。
 
 ## 技術棧
 
@@ -9,6 +9,7 @@
 | 執行環境 | Node.js（CommonJS，本機測試版本 v25） |
 | 後端 | Express 4.16、better-sqlite3 12（WAL）、jsonwebtoken、bcrypt、cors、dotenv |
 | 前端 | EJS 5 版面 + Vue 3（unpkg CDN，無打包）、Tailwind CSS 4（CLI 建置） |
+| 金流 | 綠界 ECPay 全方位金流（AIO），測試環境；本機以 QueryTradeInfo 主動查詢驗證付款（見 [features/payment-ecpay.md](./features/payment-ecpay.md)） |
 | API 文件 | swagger-jsdoc（只產出 `openapi.json`，專案內沒有 Swagger UI 路由） |
 | 測試 | Vitest 2 + supertest |
 

@@ -14,7 +14,8 @@
 ├── src/
 │   ├── database.js      # 連線 database.sqlite、建表、seed；匯出 db 單例
 │   ├── middleware/      # authMiddleware、adminMiddleware、sessionMiddleware、errorHandler
-│   └── routes/          # auth / product / cart / order / adminProduct / adminOrder / page
+│   ├── routes/          # auth / product / cart / order / ecpay / adminProduct / adminOrder / page
+│   └── services/        # ecpay.js：綠界簽章（CheckMacValue）、付款表單欄位、QueryTradeInfo 查詢
 ├── views/
 │   ├── layouts/         # front.ejs、admin.ejs（載入 Vue CDN 與共用 JS）
 │   ├── partials/        # head、header、footer、notification、admin-header、admin-sidebar
@@ -30,9 +31,9 @@
 ## 啟動流程
 
 1. `server.js` 載入 `app.js`；`app.js` 先 `dotenv.config()`。
-2. `require('./src/database')`：開啟資料庫（預設 `database.sqlite`，可用 `DB_PATH` 覆寫）、`journal_mode = WAL`、`foreign_keys = ON`，`CREATE TABLE IF NOT EXISTS` 建 5 張表，再 seed 管理員與商品。
+2. `require('./src/database')`：開啟資料庫（預設 `database.sqlite`，可用 `DB_PATH` 覆寫）、`journal_mode = WAL`、`foreign_keys = ON`，`CREATE TABLE IF NOT EXISTS` 建 6 張表，再 seed 管理員與商品。
 3. 設定 EJS（`views/`）、靜態檔（`public/`）、`cors`（`origin: FRONTEND_URL`，預設 `http://localhost:3001`）、`express.json()`、`express.urlencoded()`、`sessionMiddleware`。
-4. 掛載路由（順序）：`/api/auth`、`/api/admin/products`、`/api/admin/orders`、`/api/products`、`/api/cart`、`/api/orders`，最後 `/` 頁面路由。
+4. 掛載路由（順序）：`/api/auth`、`/api/admin/products`、`/api/admin/orders`、`/api/products`、`/api/cart`、`/api/orders`（`orderRoutes`，再接同前綴的 `ecpayRoutes`），最後 `/` 頁面路由（含 `POST /ecpay/return`）。
 5. 404：路徑以 `/api` 開頭回 JSON `NOT_FOUND`，否則渲染 `pages/404`（套用 front 版面）；最後掛 `errorHandler`。
 6. `JWT_SECRET` 只在 `node server.js` 直接執行時檢查；測試 `require('../app')` 不會檢查，由 `vitest.config.js` 的 `test.env` 提供測試用的值。
 
@@ -68,6 +69,11 @@
 | `FORBIDDEN` | 403 | 非管理員存取後台 API |
 | `NOT_FOUND` | 404 | 資源不存在，或不屬於目前使用者 |
 | `CONFLICT` | 409 | Email 重複註冊、商品存在待付款訂單而無法刪除 |
+| `NO_PAYMENT` | 400 | 查詢付款時，訂單尚未建立任何付款交易 |
+| `PAYMENT_AMOUNT_MISMATCH` | 409 | 綠界回報已付款，但金額與訂單不符 |
+| `TOO_MANY_REQUESTS` | 429 | 同一筆付款交易 10 秒內重複查詢（附 `Retry-After`） |
+| `PAYMENT_QUERY_FAILED` | 502 | 無法確認付款結果：綠界連線失敗、簽章不符、回應與本地不一致 |
+| `PAYMENT_NOT_CONFIGURED` | 503 | 綠界環境變數未設定 |
 | `INTERNAL_ERROR` | 依狀態碼 | `errorHandler` 的所有輸出都用這個碼；500 的 message 固定為 `伺服器內部錯誤` |
 
 `errorHandler` 注意：無論狀態碼為何，`error` 欄位都是 `INTERNAL_ERROR`；只有 `err.isOperational` 為真時才回傳原始 message。
