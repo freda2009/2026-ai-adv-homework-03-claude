@@ -18,8 +18,8 @@
 
 | 方法 | 路徑 | 成功碼 | 說明 |
 |------|------|--------|------|
-| POST | `/api/auth/register` | 201 | 註冊並直接回傳 token |
-| POST | `/api/auth/login` | 200 | 登入 |
+| POST | `/api/auth/register` | 201 | 註冊並直接回傳 token；帶 `X-Session-Id` 時合併訪客購物車 |
+| POST | `/api/auth/login` | 200 | 登入；帶 `X-Session-Id` 時合併訪客購物車 |
 | GET | `/api/auth/profile` | 200 | 取得目前使用者（`id, email, name, role, created_at`） |
 | GET | `/api/products` | 200 | 商品列表，`page`（預設 1）、`limit`（預設 10，上限 100），依 `created_at DESC` |
 | GET | `/api/products/:id` | 200 | 商品詳情，不存在回 404 |

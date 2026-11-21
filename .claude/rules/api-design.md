@@ -14,6 +14,7 @@ paths:
 - 分頁：`page` 預設 1 且最小 1；`limit` 預設 10 並限制在 1–100；回傳 `pagination: { total, page, limit, totalPages }`。
 - 驗證順序：必填欄位 → 格式 → 資源是否存在 → 業務規則（庫存、狀態）。
 - 只屬於使用者自己的資源，查詢時加 `AND user_id = ?`；找不到或不屬於自己都回 404，不回 403。
+- 登入／註冊成功後要合併訪客購物車（`src/services/cartService.js`，呼叫端 `authRoutes.js` 的 `mergeGuestCart`）；合併失敗必須被攔住，不可讓登入／註冊失敗。新增其他建立登入狀態的端點時也要比照處理。
 - 受保護路由用 `authMiddleware`；後台路由再加 `adminMiddleware`，順序不可對調。管理員身分不可由 request body 決定。
 - 錯誤訊息不洩漏內部細節；登入失敗不區分「帳號不存在」與「密碼錯誤」。
 - 回應不得包含 `password_hash`。

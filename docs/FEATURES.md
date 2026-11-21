@@ -18,12 +18,12 @@
 - Body 必填：`email`、`password`、`name`；缺任一個回 400 `VALIDATION_ERROR`。
 - Email 以 `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` 檢查；密碼至少 6 個字元。
 - Email 已存在回 409 `CONFLICT`（`Email 已被註冊`）。
-- 角色固定為 `user`（無法由註冊建立管理員）。成功回傳 `{ user: { id, email, name, role }, token }`，註冊後直接視為登入。
+- 角色固定為 `user`（無法由註冊建立管理員）。成功回傳 `{ user: { id, email, name, role }, token }`，註冊後直接視為登入；請求帶 `X-Session-Id` 時會把訪客購物車合併進新帳號（見 [features/cart.md](./features/cart.md)）。
 
 **POST `/api/auth/login`**（200）
 - Body 必填：`email`、`password`。
 - 帳號不存在或密碼錯誤都回同一則 401 `Email 或密碼錯誤`（不洩漏帳號是否存在）。
-- 成功回傳格式同註冊。
+- 成功回傳格式同註冊；密碼驗證通過後同樣會合併訪客購物車（密碼錯誤不合併）。
 
 **GET `/api/auth/profile`**（需 Bearer）
 - 回傳 `id, email, name, role, created_at`；使用者不存在回 404。

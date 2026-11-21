@@ -15,7 +15,7 @@
 │   ├── database.js      # 連線 database.sqlite、建表、seed；匯出 db 單例
 │   ├── middleware/      # authMiddleware、adminMiddleware、sessionMiddleware、errorHandler
 │   ├── routes/          # auth / product / cart / order / ecpay / adminProduct / adminOrder / page
-│   └── services/        # ecpay.js：綠界簽章（CheckMacValue）、付款表單欄位、QueryTradeInfo 查詢
+│   └── services/        # ecpay.js：綠界簽章、付款表單欄位、QueryTradeInfo 查詢；cartService.js：登入／註冊時合併訪客購物車
 ├── views/
 │   ├── layouts/         # front.ejs、admin.ejs（載入 Vue CDN 與共用 JS）
 │   ├── partials/        # head、header、footer、notification、admin-header、admin-sidebar

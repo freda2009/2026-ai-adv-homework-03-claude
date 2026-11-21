@@ -24,8 +24,10 @@
 | `ecpay.test.js` | 24 | `src/services/ecpay.js`：`ecpayUrlEncode`、CheckMacValue 產生與驗證（含 skill 的官方測試向量）、UTC+8 日期、MerchantTradeNo、ItemName 清理、查詢回應解析 |
 | `payments.test.js` | 23 | 綠界付款：checkout（欄位、簽章、權限、重複付款偵測）、verify（paid／金額不符／簽章不符／狀態 0／10200047／10200095／502／冪等／10 秒限流）、`/ecpay/return` 只轉址、模擬付款端點已移除 |
 | `orderDetailPage.test.js` | 9 | 前端 `order-detail.js`：隱藏表單、409、verify 結果對應、429、`?payment=checking` 自動查詢、不信任網址參數 |
+| `cartMerge.test.js` | 10 | 登入／註冊合併訪客購物車：註冊與登入兩條路徑、同商品相加、庫存上限、庫存 0 丟棄、不調低原數量、無／不同 session 不合併、密碼錯誤不合併、合併失敗不影響登入、合併後可結帳 |
+| `checkoutPage.test.js` | 5 | 前端 `checkout.js`：預填登入帳號的姓名與 Email、地址空白、取不到資料時為空字串、可自行修改、清空後仍驗證 |
 
-`apiFetch.test.js`、`headerInit.test.js`、`orderDetailPage.test.js` 是前端測試：不使用 `tests/setup.js`，改用 Node `vm` 載入 `public/js/**/*.js` 並注入假的 `Auth`／`fetch`／`document`／`Vue`，不需要資料庫。它們驗證邏輯，不等於瀏覽器實機驗證。
+`apiFetch.test.js`、`headerInit.test.js`、`orderDetailPage.test.js`、`checkoutPage.test.js` 是前端測試：不使用 `tests/setup.js`，改用 Node `vm` 載入 `public/js/**/*.js` 並注入假的 `Auth`／`fetch`／`document`／`Vue`，不需要資料庫。它們驗證邏輯，不等於瀏覽器實機驗證。
 
 **綠界一律 mock**：`payments.test.js` 以 `vi.stubGlobal('fetch', ...)` 取代 `fetch`，回傳含正確 CheckMacValue 的 URL-encoded 字串（格式依 2026-11-21 對測試環境的實測），測試不會連線綠界。`ecpay.test.js` 的官方向量來自 `.claude/skills/ecpay/test-vectors/checkmacvalue.json`（git submodule，不複製進本專案），不存在時略過。`vitest.config.js` 的 `test.env` 提供綠界測試帳號與 `BASE_URL`。
 

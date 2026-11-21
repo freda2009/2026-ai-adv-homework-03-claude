@@ -4,6 +4,12 @@
 
 ## 2026-11-21
 
+### 修正：登入後購物車與結帳資料
+- **登入／註冊會合併訪客購物車**：新增 `src/services/cartService.js`，`login`（密碼驗證通過後）與 `register` 依 `X-Session-Id` 把訪客項目併入帳號（同商品數量相加、以庫存為上限、不會調低原有數量、庫存 0 不帶入；單一交易，失敗不影響登入）。原本訪客加入的商品留在 `session_id`、登入後讀 `user_id` 而看似消失，導致「訪客加商品 → 結帳 → 登入」後結帳頁是空的。
+- **結帳預填**：收件人姓名與 Email 自動帶入登入帳號（`Auth.getUser()`），可自行修改；地址仍須自填。
+- 新增 `tests/cartMerge.test.js`（10）、`tests/checkoutPage.test.js`（5）。
+- 計畫：[cart-merge-and-checkout-prefill](./plans/2026-11-21-cart-merge-and-checkout-prefill.md)
+
 ### 新功能：綠界 ECPay 付款
 - 新增 `src/services/ecpay.js`（CheckMacValue、付款表單欄位、QueryTradeInfo 查詢）與 `src/routes/ecpayRoutes.js`：`POST /api/orders/:id/ecpay/checkout` 建立付款、`POST /api/orders/:id/ecpay/verify` 由後端主動查詢綠界並在驗證通過後把訂單改為 `paid`（取代本機收不到的 Server Notify）。
 - 新增 `payments` 資料表（付款嘗試）；新增 `POST /ecpay/return`（只轉址、不改狀態）。
