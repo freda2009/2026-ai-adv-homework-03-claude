@@ -4,15 +4,33 @@ const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../database');
 const authMiddleware = require('../middleware/authMiddleware');
+const cartService = require('../services/cartService');
 
 const router = express.Router();
+
+// 登入／註冊成功後，把訪客購物車（X-Session-Id）合併進帳號。
+// 合併失敗不可讓登入／註冊失敗：交易已回滾，訪客項目保留，下次登入可重試。
+function mergeGuestCart(req, userId) {
+  try {
+    cartService.mergeSessionCartIntoUser(userId, req.sessionId);
+  } catch (err) {
+    console.error('合併訪客購物車失敗：', err.message);
+  }
+}
 
 /**
  * @openapi
  * /api/auth/register:
  *   post:
  *     summary: 註冊新帳號
+ *     description: 若請求帶有 X-Session-Id，會把該訪客購物車合併進新帳號（同商品數量相加，以庫存為上限）。
  *     tags: [Auth]
+ *     parameters:
+ *       - in: header
+ *         name: X-Session-Id
+ *         required: false
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -109,6 +127,8 @@ router.post('/register', (req, res) => {
 
   const user = db.prepare('SELECT id, email, name, role, created_at FROM users WHERE id = ?').get(id);
 
+  mergeGuestCart(req, user.id);
+
   const token = jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
@@ -130,7 +150,14 @@ router.post('/register', (req, res) => {
  * /api/auth/login:
  *   post:
  *     summary: 登入
+ *     description: 若請求帶有 X-Session-Id，登入成功後會把該訪客購物車合併進帳號（同商品數量相加，以庫存為上限）；密碼錯誤時不合併。
  *     tags: [Auth]
+ *     parameters:
+ *       - in: header
+ *         name: X-Session-Id
+ *         required: false
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -206,6 +233,8 @@ router.post('/login', (req, res) => {
       message: 'Email 或密碼錯誤'
     });
   }
+
+  mergeGuestCart(req, user.id);
 
   const token = jwt.sign(
     { userId: user.id, email: user.email, role: user.role },

@@ -7,7 +7,13 @@ createApp({
     const loading = ref(true);
     const submitting = ref(false);
     const cartItems = ref([]);
-    const form = ref({ recipientName: '', recipientEmail: '', recipientAddress: '' });
+    // 預填登入帳號的姓名與 Email（使用者可自行修改）；帳號沒有地址，地址維持空白。
+    const user = Auth.getUser();
+    const form = ref({
+      recipientName: (user && user.name) || '',
+      recipientEmail: (user && user.email) || '',
+      recipientAddress: ''
+    });
     const errors = ref({});
 
     const cartTotal = computed(function () {
