@@ -38,3 +38,6 @@ coverage/
 
 .claude/*.local.json
 public/css/output.css
+
+# 由 npm run openapi（及 auto-api-docs hook）產生的 OpenAPI 文件
+openapi.json
