@@ -11,8 +11,8 @@
 - 訂單詳情頁改為「前往綠界付款」與「重新查詢付款結果」，且不再信任網址的 `?payment=` 顯示成功。
 - 新增 `.env.example` 的 `ECPAY_RETURN_URL`、`DB_PATH` 說明；綠界 ECPay skill 以 git submodule 引用到 `.claude/skills/ecpay`（授權為 All Rights Reserved、禁止重新散布，所以只記錄指標、不複製內容）。
 - 測試 +56（`ecpay` 24、`payments` 23、`orderDetailPage` 9），總計 101 個，綠界一律 mock。
-- 對綠界測試環境的實測結果與尚未驗證的項目見 [features/payment-ecpay.md](./features/payment-ecpay.md)。
-- 計畫：[ecpay-payment](./plans/2026-11-21-ecpay-payment.md)
+- 使用者實機驗證網路 ATM（`WebATM_LAND`）付款成功：自動導回 localhost、自動查詢即變 `paid`；信用卡與離線付款尚未實測。實測結果見 [features/payment-ecpay.md](./features/payment-ecpay.md)。
+- 計畫：[ecpay-payment](./plans/archive/2026-11-21-ecpay-payment.md)
 
 ### 修正
 - `apiFetch`：登入／註冊的 401（帳密錯誤）不再清除登入資料並導向 `/login`，改為丟出錯誤讓登入頁顯示訊息；已在 `/login` 頁時其他 401 不再重複導向。

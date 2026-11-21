@@ -1,7 +1,7 @@
 # 串接綠界 ECPay 金流（以主動查詢驗證付款）
 
-- 狀態：進行中
-- 建立日期：2026-11-21 ／ 完成日期：—
+- 狀態：已完成
+- 建立日期：2026-11-21 ／ 完成日期：2026-11-21
 - 相關連結：`.claude/skills/ecpay`（guides/01、13、24）、官方 QueryTradeInfo https://developers.ecpay.com.tw/2890.md、docs/features/orders.md
 
 ## 背景
@@ -41,16 +41,16 @@
 - 官方頁面**未說明**查詢回應格式（URL-encoded 或 JSON）與「查無訂單」的回應；skill 內 `10200047` 說明互相矛盾（guides/01 稱不存在、guides/20 稱重複）。以 Task 0 驗證，解析器先同時支援兩種格式。
 
 ## Tasks
-- [x] 0. Spike（staging，帳號 3002607）：確認 ① 綠界是否接受 `http://localhost:3001` 的 `OrderResultURL`／`ReturnURL`（skill 稱僅支援 80/443、要 https）② 查詢回應格式 ③ 查無訂單的回應 ④ 信用卡付款後多久查得到 `TradeStatus=1` ⑤ ATM 模擬付款後查詢是否為 1。結果寫入「與計畫差異」並視需要修訂 Spec。**（部分完成：②③ 已實測；① 只確認付款頁可顯示；④⑤ 未驗證，併入 Task 7）**
+- [x] 0. Spike（staging，帳號 3002607）：確認 ① 綠界是否接受 `http://localhost:3001` 的 `OrderResultURL`／`ReturnURL`（skill 稱僅支援 80/443、要 https）② 查詢回應格式 ③ 查無訂單的回應 ④ 信用卡付款後多久查得到 `TradeStatus=1` ⑤ ATM 模擬付款後查詢是否為 1。結果寫入「與計畫差異」並視需要修訂 Spec。**（②③ 以 API 實測；①④ 已由使用者實機確認；⑤ 未驗證，見執行結果）**
 - [x] 1. 先寫 `tests/ecpay.test.js`：CheckMacValue 向量（讀 skill 的 `test-vectors/checkmacvalue.json`，不存在則 skip，不複製第三方檔案）。
 - [x] 2. 實作 `src/services/ecpay.js`。
 - [x] 3. `src/database.js` 新增 `payments`；`.env.example`、`vitest.config.js` 補 ECPAY／`BASE_URL` 測試值。
 - [x] 4. 先寫 `tests/payments.test.js`（mock `global.fetch`，不連網）：checkout 欄位與簽章、非本人 404、非 pending 400、verify 成功／金額不符／CMV 不符／狀態 0／10200095／502／冪等／10 秒限流／重複付款偵測、`/ecpay/return` 只轉址不改狀態。
 - [x] 5. 實作路由並掛載於 `app.js`；刪除 `PATCH /:id/pay` 與其 `@openapi`。
 - [x] 6. 前端 `order-detail.ejs`、`order-detail.js`：付款按鈕、重新查詢、`checking` 狀態與橫幅；表單以 DOM API 建立。
-- [ ] 7. 實機驗收（staging，**需人工在瀏覽器完成**）：測試卡 `4311-9522-2222-2222`、CVV 222、3DS `1234`；並確認 Task 0 的 ①④⑤。
+- [x] 7. 實機驗收（staging，由使用者在瀏覽器完成）：實測的是網路 ATM（`WebATM_LAND`）；信用卡（測試卡 `4311-9522-2222-2222`）與離線付款（ATM 虛擬帳號／超商／條碼）未實測。
 - [x] 8. 文件與規則：docs（ARCHITECTURE、api-routes、database、DEVELOPMENT 環境變數、features/orders、TESTING、CHANGELOG）、新增 `docs/features/payment-ecpay.md`、`.claude/rules`（api-design、security）、CLAUDE.md 關鍵規則「訂單只能由綠界查詢驗證後變成 paid」；`.claude/skills/ecpay` 以 git submodule 引用（授權為 All Rights Reserved、禁止重新散布，不複製內容）。
-- [ ] 9. 填寫「執行結果」，`git mv` 至 `docs/plans/archive/`。
+- [x] 9. 填寫「執行結果」，`git mv` 至 `docs/plans/archive/`。
 
 ## 驗證
 - `npm test` 全過（記憶體資料庫、mock 綠界）；`grep` 確認已無 `/pay` 模擬端點與 `simulatePay`；開發資料庫 `database.sqlite` 與基準相同。
@@ -61,15 +61,17 @@
 - 自動化測試無法連線綠界，實機結果需人工記錄；刪除模擬付款後沒有離線展示的替代方案（使用者已決定）。
 
 ## 執行結果（完成後填寫，歸檔前必填）
-（狀態維持「進行中」：程式與自動化驗證已完成，Task 7 實機驗收待人工，完成後再歸檔。）
+（使用者於 2026-11-21 實機驗收後完成並歸檔。）
 - 實際變更：新增 `src/services/ecpay.js`、`src/routes/ecpayRoutes.js`、`payments` 表、`POST /ecpay/return`；移除 `PATCH /api/orders/:id/pay` 與前端模擬付款；`order-detail` 頁改為綠界付款並不再信任 `?payment=`；`.gitmodules`（submodule）、`.env.example`、`vitest.config.js` 更新。
 - 與計畫差異：
   - Spike 實測（2026-11-21，測試帳號）：查詢回應為 HTTP 200／`text/html`／URL-encoded；查無訂單 `TradeStatus=10200047`；建單後未付款為 `0`；錯誤簽章為 HTTP 500＋`10200073`；我的 CheckMacValue 被綠界接受。建單的付款頁在 `http://localhost:3001` 回傳網址下能顯示，但錯誤簽章也能顯示，所以建單簽章是否被檢查未知。
   - 新增：`buildItemName` 另外移除 `& + % =`（避免 URL-encoded 回應解析後與簽章不一致）；`queryTradeInfo` 對非 2xx 也帶出 `TradeStatus`；新增 `tests/orderDetailPage.test.js`（9 個）。
   - 原計畫把 skill 加入 `.gitignore`；使用者改為以 git submodule 納入（綠界授權禁止重新散布其內容，所以只記錄指標）。
+  - 實機確認（使用者回報，並以開發資料庫紀錄佐證）：① 綠界會導回 `http://localhost:3001` 的 `OrderResultURL`；④ 網路 ATM 付款後約 10 秒內即查得到 `TradeStatus=1`。
   - 修正敘述：checkout 的舊交易檢查也會經 `checkAttempt` 設定 `paid`，並非「只有 verify」。
 - 測試結果：`npm test` 全過（含 `ecpay`、`payments`、`orderDetailPage`，綠界一律 mock）；對真實綠界測試環境用暫存資料庫與真實伺服器跑過 checkout→付款頁→verify（pending）→限流 429→`/ecpay/return` 303→`?payment=` 跳脫，皆符合預期；開發資料庫未被改動。
+  - 實機：以網路 ATM 付款後自動導回訂單頁、自動查詢即變 `paid`。開發資料庫的 `payments`：`status=paid`、`trade_status=1`、`payment_type=WebATM_LAND`、金額 1280 與訂單相符；付款（18:42:34）後約 10 秒完成驗證。
 - 文件更新：新增 `docs/features/payment-ecpay.md`；更新 ARCHITECTURE、api-routes、database、DEVELOPMENT、FEATURES、README、orders、frontend、TESTING、CHANGELOG、CLAUDE.md、`.claude/rules`（api-design、security）與三個 agents。
 - 遺留事項：
-  - **未用真實綠界驗證**：付款成功後 `TradeStatus=1` 的回應、信用卡付款後多久查得到、綠界是否導回 `http://localhost` 的 `OrderResultURL`、ATM／超商付款後查詢是否為 1（`ChoosePayment=ALL` 的離線付款可能長時間停在 pending）。測試帳號付款頁的「測試付款請點此」是需填卡號的模擬表單，不是一鍵付款。
+  - 未實測：信用卡（含 3D 驗證）的付款成功回應與時間；離線付款（ATM 虛擬帳號／超商代碼／條碼）付款後查詢是否為 `1`。`WebATM_LAND` 是即時付款，不能代表離線方式；`ChoosePayment=ALL` 下離線付款的訂單可能長時間停在 pending。
   - 失敗的付款不還原庫存；無退款、對帳、發票。

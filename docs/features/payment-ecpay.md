@@ -1,7 +1,7 @@
 # 綠界 ECPay 付款（本機以主動查詢驗證）
 
 程式：`src/services/ecpay.js`（簽章、表單欄位、查詢）、`src/routes/ecpayRoutes.js`（checkout、verify）、`src/routes/pageRoutes.js`（`POST /ecpay/return`）。
-計畫與驗證紀錄：[plans/2026-11-21-ecpay-payment.md](../plans/2026-11-21-ecpay-payment.md)。
+計畫與驗證紀錄：[plans/archive/2026-11-21-ecpay-payment.md](../plans/archive/2026-11-21-ecpay-payment.md)。
 
 ## 為什麼用主動查詢
 專案只在本機執行，綠界無法呼叫 ReturnURL（Server Notify）。所以付款結果**只由後端呼叫 QueryTradeInfo 確認**，不信任瀏覽器帶回的任何內容。訂單變成 `paid` 的唯一路徑是 `ecpayRoutes.js` 的 `checkAttempt`（呼叫 QueryTradeInfo 並驗證），由 verify 與 checkout 的舊交易檢查呼叫。
@@ -43,10 +43,11 @@
 - `QueryTradeInfo` 回應為 HTTP 200、`text/html`、URL-encoded 字串；查無訂單為 `TradeStatus=10200047`、`TradeAmt=0`；建單後未付款為 `TradeStatus=0`（有 `TradeNo`、`TradeDate`）。
 - 錯誤的 CheckMacValue 會得到 HTTP 500、`TradeStatus=10200073`，所以 `queryTradeInfo` 對非 2xx 也會把 TradeStatus 帶進錯誤訊息。
 - 建單（`AioCheckOut/V5`）的付款頁在 `http://localhost:3001` 回傳網址下能正常顯示；但**錯誤的 CheckMacValue 也能顯示付款頁**，所以建單簽章是否被檢查要到付款時才知道。
-- **尚未用真實綠界驗證**：付款成功後 `TradeStatus=1` 的回應內容、信用卡付款後多久查得到、綠界是否真的導回 `http://localhost` 的 `OrderResultURL`、ATM／超商付款後查詢是否為 `1`。測試帳號付款頁上的「測試付款請點此」會開啟需填卡號的模擬表單，不是一鍵付款。
+- **實機驗證（使用者，2026-11-21，網路 ATM）**：付款後瀏覽器**自動導回** `http://localhost:3001` 的 `OrderResultURL`（綠界接受 localhost 回傳網址）、訂單頁自動查詢即變 `paid`。開發資料庫紀錄：`trade_status=1`、`payment_type=WebATM_LAND`、金額與訂單相符，付款後約 10 秒完成驗證。
+- **尚未驗證**：信用卡（含 3D 驗證）的付款成功回應與時間；離線付款（ATM 虛擬帳號、超商代碼、條碼）付款後查詢是否為 `1`（`WebATM_LAND` 是即時付款，不能代表離線方式）。測試帳號付款頁上的「測試付款請點此」會開啟需填卡號的模擬表單，不是一鍵付款。
 
 ## 已知限制
-- `ChoosePayment=ALL` 含 ATM／超商／條碼：官方要求離線付款「等待綠界通知」，查詢 API 是否反映這類付款未證實，訂單可能長時間停在 pending；這些方式不支援 `OrderResultURL`。
+- `ChoosePayment=ALL` 含 ATM 虛擬帳號／超商／條碼等離線付款：官方要求離線付款「等待綠界通知」，查詢 API 是否反映這類付款**未驗證**（本專案收不到通知），訂單可能長時間停在 pending；這些方式不支援 `OrderResultURL`，需用 `ClientBackURL` 回站後按「重新查詢付款結果」。
 - 信用卡建議付款後約 10 分鐘再查，銀行未回覆時 `TradeStatus` 仍為 0。
 - 沒有退款、對帳、發票；失敗的交易不會還原庫存。
 

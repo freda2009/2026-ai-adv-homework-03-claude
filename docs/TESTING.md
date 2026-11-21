@@ -29,7 +29,7 @@
 
 **綠界一律 mock**：`payments.test.js` 以 `vi.stubGlobal('fetch', ...)` 取代 `fetch`，回傳含正確 CheckMacValue 的 URL-encoded 字串（格式依 2026-11-21 對測試環境的實測），測試不會連線綠界。`ecpay.test.js` 的官方向量來自 `.claude/skills/ecpay/test-vectors/checkmacvalue.json`（git submodule，不複製進本專案），不存在時略過。`vitest.config.js` 的 `test.env` 提供綠界測試帳號與 `BASE_URL`。
 
-尚未涵蓋：註冊與商品欄位驗證錯誤、`STOCK_INSUFFICIENT`、購物車登入模式的改／刪、頁面路由（`/ecpay/return` 除外）、`errorHandler`，以及**真實綠界的付款成功回應**（需人工實機驗證，見 [features/payment-ecpay.md](./features/payment-ecpay.md)）。
+尚未涵蓋：註冊與商品欄位驗證錯誤、`STOCK_INSUFFICIENT`、購物車登入模式的改／刪、頁面路由（`/ecpay/return` 除外）、`errorHandler`。真實綠界：已由使用者實機驗證網路 ATM（`WebATM_LAND`）付款成功，**信用卡與離線付款（ATM 虛擬帳號／超商／條碼）尚未實測**，見 [features/payment-ecpay.md](./features/payment-ecpay.md)。
 
 ## 輔助函式（`tests/setup.js`）
 
