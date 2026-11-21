@@ -30,6 +30,7 @@
 | `PORT` | 伺服器埠號 | 否 | `3001` |
 | `FRONTEND_URL` | CORS `origin` | 否 | `http://localhost:3001` |
 | `ADMIN_EMAIL`／`ADMIN_PASSWORD` | 管理員 seed 帳密 | 否 | `admin@hexschool.com`／`12345678` |
+| `DB_PATH` | 資料庫路徑；`:memory:` 為記憶體資料庫；相對路徑以專案根目錄解析 | 否 | `database.sqlite`（測試由 `vitest.config.js` 設為 `:memory:`） |
 | `NODE_ENV` | `test` 時管理員 seed 的 bcrypt cost 為 1 | 否 | 未設 |
 | `BASE_URL`、`ECPAY_*` | 範例檔列出，**程式碼未使用** | 否 | — |
 

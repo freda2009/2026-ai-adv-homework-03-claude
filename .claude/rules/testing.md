@@ -10,7 +10,8 @@ paths:
 - 需要使用者用 `registerUser()`（隨機 email）；需要管理員用 `getAdminToken()`（寫死 `admin@hexschool.com`／`12345678`）。
 - 商品 id 從 `GET /api/products` 取得，不寫死。
 - 成功斷言 `error` 為 `null`；失敗斷言 `data` 為 `null` 且 `error` 不為 `null`；同時檢查 HTTP 狀態碼。
-- 每個檔案自行準備資料，不依賴其他檔案的執行順序（`sequence.files` 是否生效未驗證）。
-- 測試沒有資料庫隔離：會寫入開發用的 `database.sqlite` 並消耗 `products[0]` 的庫存。不要寫會大量扣庫存或刪除既有 seed 商品的測試。
+- 每個測試檔自行準備資料，不依賴其他檔案；`sequence.files` 實測沒有生效，不要依賴執行順序。
+- 測試使用記憶體資料庫（`vitest.config.js` 的 `test.env.DB_PATH=:memory:`），每個測試檔各有一份全新資料（含 seed）。不要移除該設定；`tests/setup.js` 的 `db.memory` 安全閥會在連到實體資料庫時中止測試。同一檔案內的測試共用資料庫，會看到彼此的資料。
+- `getAdminToken()` 的帳密需與 `test.env.ADMIN_EMAIL`／`ADMIN_PASSWORD` 一致。
 - 新增端點時至少補：成功案例、驗證失敗（400）、未授權（401）／權限不足（403）、不存在（404）。
 - 完整說明見 docs/TESTING.md。

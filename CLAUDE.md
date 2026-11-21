@@ -12,7 +12,7 @@ npm start                # css:build 後啟動，預設 http://localhost:3001
 npm run dev:server       # 只啟動伺服器（不重建 CSS）
 npm run dev:css          # Tailwind watch
 npm run openapi          # 由 src/routes/*.js 的 @openapi 註解產生 openapi.json
-npm test                 # vitest run（會讀寫開發用的 database.sqlite）
+npm test                 # vitest run（使用記憶體資料庫，不碰 database.sqlite，不需 .env）
 ```
 
 ## 關鍵規則
@@ -35,7 +35,7 @@ npm test                 # vitest run（會讀寫開發用的 database.sqlite）
 
 ## 必要遵守項目
 - 不要讀取、輸出或提交 `.env`；機密只放 `.env`，範例值放 `.env.example`。
-- 測試沒有資料庫隔離，會直接寫入 `database.sqlite` 並消耗商品庫存；不要在有重要資料時執行。
+- 測試必須使用記憶體資料庫（`vitest.config.js` 的 `DB_PATH=:memory:`，`tests/setup.js` 有安全閥）；不要移除這個設定，也不要讓測試連到 `database.sqlite`。
 - 受保護的路由必須掛 `authMiddleware`；後台路由再加 `adminMiddleware`（兩者順序不可對調）。
 - 前端渲染使用者資料用 `{{ }}` 或 `textContent`；避免 `innerHTML`／`v-html` 插入未跳脫內容。
 - 本檔與 docs/ 下每份文件不超過 500 行（目標 100 行內）；超過時精簡或拆至 docs/ 子資料夾，本檔只留概述與連結。

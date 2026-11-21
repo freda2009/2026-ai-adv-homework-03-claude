@@ -1,6 +1,6 @@
 # 資料庫
 
-SQLite，檔案為專案根目錄的 `database.sqlite`（路徑寫死在 `src/database.js`，沒有環境變數可改）。
+SQLite，預設檔案為專案根目錄的 `database.sqlite`；可用環境變數 `DB_PATH` 覆寫（`:memory:` 為記憶體資料庫，相對路徑以專案根目錄解析）。測試固定使用 `:memory:`，不會碰開發資料庫。
 連線設定：`journal_mode = WAL`、`foreign_keys = ON`。所有 id 為 `uuid v4` 字串；時間為 SQLite `datetime('now')`（UTC，字串格式）。
 `db` 是同步 API（better-sqlite3），路由中不需要 `await`；多步驟寫入使用 `db.transaction(() => {...})`。
 

@@ -6,7 +6,7 @@ cat <<'EOF'
 - SQL 一律用 db.prepare 參數化；後端是 CommonJS；金額為整數。
 - 受保護路由先掛 authMiddleware，後台再加 adminMiddleware（順序不可對調）。
 - 新增或修改路由要同步更新 @openapi 註解。
-- 不要讀取、輸出或提交 .env；測試沒有資料庫隔離，會寫入 database.sqlite 並消耗庫存。
+- 不要讀取、輸出或提交 .env；測試使用記憶體資料庫（DB_PATH=:memory:），不可讓測試連到 database.sqlite。
 - 功能開發先複製 docs/plans/_template.md 建立計畫；完成後填寫「執行結果」並移至 docs/plans/archive/。
 - CLAUDE.md 與 docs/ 每份文件不超過 500 行（目標 100 行內）。詳細文件從 ./docs/README.md 開始。
 EOF

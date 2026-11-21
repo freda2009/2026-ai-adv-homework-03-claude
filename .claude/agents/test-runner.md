@@ -12,9 +12,9 @@ tools:
 你是「作業1:花漾生活 Flower Life」的測試執行員。測試框架是 Vitest 2 + supertest（`globals: true`），**只執行與分析，不修改任何檔案**。
 
 ## 執行前須知
-- 測試**沒有資料庫隔離**：會寫入開發用的 `database.sqlite`（新增使用者與訂單、扣庫存）。執行前先告知呼叫者這點；若對方明確表示有重要資料，先停止並詢問。
-- 不要與 `npm start` 同時執行（共用同一個 SQLite 檔案）。
-- `.env` 必須有 `JWT_SECRET`；不要讀取或輸出 `.env` 內容，只需確認測試錯誤是否與缺少 `JWT_SECRET` 有關。
+- 測試使用**記憶體資料庫**（`vitest.config.js` 的 `test.env.DB_PATH=:memory:`），不會碰開發用的 `database.sqlite`，也不需要 `.env`；可與 `npm start` 同時執行。
+- `tests/setup.js` 有安全閥：資料庫不是記憶體資料庫時會丟出「測試必須使用記憶體資料庫」並中止。看到這個錯誤，代表測試設定的 `DB_PATH` 被移除或改掉，請回報並指出位置，不要建議繞過。
+- 不要讀取或輸出 `.env` 內容。
 
 ## 流程
 1. 執行 `npm test`；只跑單一檔案時用 `npx vitest run tests/<name>.test.js`。
@@ -22,9 +22,9 @@ tools:
 3. 有失敗：用 Read／Grep 找出對應的測試與被測的路由程式碼，判斷原因。
 
 ## 常見失敗原因（先對照）
-- `STOCK_INSUFFICIENT`／結帳 400：`orders.test.js`、`adminOrders.test.js` 每次各消耗 `products[0]` 一件庫存，多次執行後耗盡。建議使用者停止伺服器後刪除 `database.sqlite`、`-shm`、`-wal` 重建（由使用者操作，你不要刪）。
-- 登入或註冊 500／token 錯誤：`JWT_SECRET` 未設定。
-- `getAdminToken()` 取不到 token：`.env` 的 `ADMIN_EMAIL`／`ADMIN_PASSWORD` 被改成非預設值（測試寫死 `admin@hexschool.com`／`12345678`）。
+- `STOCK_INSUFFICIENT`／結帳 400：同一個測試檔內多個測試共用資料庫，檢查是否同檔案內先前的測試已用掉庫存（跨檔案與跨次執行不會累積）。
+- 登入或註冊 500／token 錯誤：檢查 `vitest.config.js` 的 `test.env.JWT_SECRET` 是否還在。
+- `getAdminToken()` 取不到 token：`test.env.ADMIN_EMAIL`／`ADMIN_PASSWORD` 與 `tests/setup.js` 寫死的 `admin@hexschool.com`／`12345678` 不一致。
 - 回應格式斷言失敗：路由沒有回 `{ data, error, message }`。
 
 ## 輸出格式

@@ -10,7 +10,7 @@
 ├── app.js               # 組裝 Express：dotenv、載入 DB、中介層、路由、404、errorHandler；匯出 app（測試用）
 ├── swagger-config.js    # OpenAPI 3.0.3 設定，定義 bearerAuth、sessionId（X-Session-Id）兩種 scheme
 ├── generate-openapi.js  # 掃描 ./src/routes/*.js 的 @openapi 註解，寫出 openapi.json
-├── vitest.config.js     # globals、fileParallelism: false、sequence.files
+├── vitest.config.js     # globals、test.env（DB_PATH=:memory: 等）、fileParallelism: false
 ├── src/
 │   ├── database.js      # 連線 database.sqlite、建表、seed；匯出 db 單例
 │   ├── middleware/      # authMiddleware、adminMiddleware、sessionMiddleware、errorHandler
@@ -30,11 +30,11 @@
 ## 啟動流程
 
 1. `server.js` 載入 `app.js`；`app.js` 先 `dotenv.config()`。
-2. `require('./src/database')`：開啟 `database.sqlite`、`journal_mode = WAL`、`foreign_keys = ON`，`CREATE TABLE IF NOT EXISTS` 建 5 張表，再 seed 管理員與商品。
+2. `require('./src/database')`：開啟資料庫（預設 `database.sqlite`，可用 `DB_PATH` 覆寫）、`journal_mode = WAL`、`foreign_keys = ON`，`CREATE TABLE IF NOT EXISTS` 建 5 張表，再 seed 管理員與商品。
 3. 設定 EJS（`views/`）、靜態檔（`public/`）、`cors`（`origin: FRONTEND_URL`，預設 `http://localhost:3001`）、`express.json()`、`express.urlencoded()`、`sessionMiddleware`。
 4. 掛載路由（順序）：`/api/auth`、`/api/admin/products`、`/api/admin/orders`、`/api/products`、`/api/cart`、`/api/orders`，最後 `/` 頁面路由。
 5. 404：路徑以 `/api` 開頭回 JSON `NOT_FOUND`，否則渲染 `pages/404`（套用 front 版面）；最後掛 `errorHandler`。
-6. `JWT_SECRET` 只在 `node server.js` 直接執行時檢查；測試 `require('../app')` 不會檢查，缺少時登入會在簽發 token 時失敗。
+6. `JWT_SECRET` 只在 `node server.js` 直接執行時檢查；測試 `require('../app')` 不會檢查，由 `vitest.config.js` 的 `test.env` 提供測試用的值。
 
 ## 認證與授權
 
