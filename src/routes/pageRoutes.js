@@ -1,5 +1,20 @@
 const express = require('express');
+const db = require('../database');
 const router = express.Router();
+
+// 綠界付款完成後，消費者的瀏覽器會 POST 到這裡（OrderResultURL）。
+// 內容不可信：只用 MerchantTradeNo 查出訂單 id 並轉址，不改任何狀態；
+// 付款結果由訂單頁呼叫 POST /api/orders/:id/ecpay/verify 向綠界查詢後才確認。
+router.post('/ecpay/return', function (req, res) {
+  const tradeNo = req.body && req.body.MerchantTradeNo;
+  if (typeof tradeNo === 'string' && /^[A-Za-z0-9]{1,20}$/.test(tradeNo)) {
+    const payment = db.prepare('SELECT order_id FROM payments WHERE merchant_trade_no = ?').get(tradeNo);
+    if (payment) {
+      return res.redirect(303, '/orders/' + encodeURIComponent(payment.order_id) + '?payment=checking');
+    }
+  }
+  res.redirect(303, '/orders');
+});
 
 // Helper to render with front layout
 function renderFront(res, page, locals = {}) {

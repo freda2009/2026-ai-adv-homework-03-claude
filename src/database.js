@@ -71,6 +71,22 @@ function initializeDatabase() {
       quantity INTEGER NOT NULL,
       FOREIGN KEY (order_id) REFERENCES orders(id)
     );
+
+    -- 綠界付款嘗試：一張訂單可有多筆（MerchantTradeNo 在綠界永久唯一，每次付款都要新的）
+    CREATE TABLE IF NOT EXISTS payments (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL,
+      merchant_trade_no TEXT UNIQUE NOT NULL,
+      amount INTEGER NOT NULL,
+      status TEXT NOT NULL DEFAULT 'created' CHECK(status IN ('created', 'paid', 'failed')),
+      ecpay_trade_no TEXT,
+      trade_status TEXT,
+      payment_type TEXT,
+      paid_at TEXT,
+      last_checked_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (order_id) REFERENCES orders(id)
+    );
   `);
 
   // Seed data
