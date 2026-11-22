@@ -2,6 +2,7 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
+const { addOrderShippingColumns } = require('./utils/schemaMigrations');
 
 // DB_PATH: ':memory:' 使用記憶體資料庫（測試用）；相對路徑以專案根目錄解析；
 // 未設定時使用專案根目錄的 database.sqlite。
@@ -88,6 +89,9 @@ function initializeDatabase() {
       FOREIGN KEY (order_id) REFERENCES orders(id)
     );
   `);
+
+  // orders 的運費欄位：全新與既有的資料庫都由這裡補上（見 src/utils/schemaMigrations.js）。
+  addOrderShippingColumns(db);
 
   // Seed data
   seedAdminUser();

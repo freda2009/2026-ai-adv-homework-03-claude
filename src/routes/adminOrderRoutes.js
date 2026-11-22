@@ -57,6 +57,14 @@ router.use(authMiddleware, adminMiddleware);
  *                             type: string
  *                           recipient_email:
  *                             type: string
+ *                           subtotal_amount:
+ *                             type: integer
+ *                           shipping_method:
+ *                             type: string
+ *                             nullable: true
+ *                             enum: [home_delivery, convenience_store]
+ *                           shipping_fee:
+ *                             type: integer
  *                           total_amount:
  *                             type: integer
  *                           status:
@@ -153,6 +161,20 @@ router.get('/', (req, res) => {
  *                       type: string
  *                     recipient_address:
  *                       type: string
+ *                     subtotal_amount:
+ *                       type: integer
+ *                     shipping_method:
+ *                       type: string
+ *                       nullable: true
+ *                       enum: [home_delivery, convenience_store]
+ *                     base_shipping_fee:
+ *                       type: integer
+ *                     remote_surcharge:
+ *                       type: integer
+ *                     urgent_surcharge:
+ *                       type: integer
+ *                     shipping_fee:
+ *                       type: integer
  *                     total_amount:
  *                       type: integer
  *                     status:

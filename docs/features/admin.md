@@ -29,7 +29,7 @@
 - 回傳 `{ orders, pagination }`，`orders` 為 `orders` 表全欄位，`created_at DESC`。
 
 **GET `/:id`**
-- 回傳訂單全欄位加 `items`（`order_items`）與 `user`（`{ name, email }`，使用者已不存在時為 `null`）。
+- 回傳訂單全欄位（含運費明細，見 [shipping.md](./shipping.md)）加 `items`（`order_items`）與 `user`（`{ name, email }`，使用者已不存在時為 `null`）。
 - 不存在 404 `訂單不存在`。
 
 後台**沒有**修改訂單狀態或刪除訂單的端點。

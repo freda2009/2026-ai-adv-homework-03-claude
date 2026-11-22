@@ -9,6 +9,7 @@ paths:
 - 回應一律 `{ data, error, message }`：成功 `error: null`；失敗 `data: null`、`error` 為 `UPPER_SNAKE_CASE` 錯誤碼、`message` 為繁體中文。
 - 既有錯誤碼：`VALIDATION_ERROR`、`STOCK_INSUFFICIENT`、`CART_EMPTY`、`INVALID_STATUS`、`UNAUTHORIZED`、`FORBIDDEN`、`NOT_FOUND`、`CONFLICT`，以及付款相關的 `NO_PAYMENT`、`PAYMENT_AMOUNT_MISMATCH`、`TOO_MANY_REQUESTS`、`PAYMENT_QUERY_FAILED`、`PAYMENT_NOT_CONFIGURED`。新增前先沿用，確實需要再新增並更新 docs/ARCHITECTURE.md 的錯誤碼表。
 - **訂單 `paid` 只能由 `src/routes/ecpayRoutes.js` 的 `checkAttempt` 設定**（由 verify 與 checkout 的舊交易檢查呼叫）：必須先呼叫綠界 QueryTradeInfo，並通過 CheckMacValue、`MerchantTradeNo`、金額（同時等於交易金額與訂單金額）與 `TradeStatus === '1'` 檢查，且在單一 `db.transaction` 內更新 `payments` 與 `orders`。不可新增其他能把訂單改成 `paid` 的端點，也不可依 request body 或網址參數決定付款結果。
+- **運費只由 `src/utils/shipping.js` 計算**：建立訂單時由後端依購物車算出 `subtotal_amount`，再以 `calculateShipping` 算運費，`total_amount = subtotal_amount + shipping_fee`；不接受 body 傳入的任何金額。配送選項（`shippingMethod`、`isRemoteArea`、`isUrgent`）用 `validateShippingOptions` 驗證，不合法回 400 `VALIDATION_ERROR`。不要在路由或前端另寫一份費率；前端預估一律呼叫 `GET /api/shipping/quote`。
 - 呼叫綠界的端點要限流（同一筆交易兩次查詢至少間隔 10 秒），並把 `EcpayError` 轉成 502／503，不可把綠界的原始回應或金鑰回傳給用戶端。
 - 狀態碼：建立資源 201（註冊、建立訂單、新增商品）、其餘成功 200；缺欄位或格式錯誤 400、未登入 401、權限不足 403、不存在 404、衝突 409。
 - 分頁：`page` 預設 1 且最小 1；`limit` 預設 10 並限制在 1–100；回傳 `pagination: { total, page, limit, totalPages }`。

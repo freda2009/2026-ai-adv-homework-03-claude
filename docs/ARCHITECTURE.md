@@ -14,8 +14,9 @@
 ├── src/
 │   ├── database.js      # 連線 database.sqlite、建表、seed；匯出 db 單例
 │   ├── middleware/      # authMiddleware、adminMiddleware、sessionMiddleware、errorHandler
-│   ├── routes/          # auth / product / cart / order / ecpay / adminProduct / adminOrder / page
-│   └── services/        # ecpay.js：綠界簽章、付款表單欄位、QueryTradeInfo 查詢；cartService.js：登入／註冊時合併訪客購物車
+│   ├── routes/          # auth / product / cart / shipping / order / ecpay / adminProduct / adminOrder / page
+│   ├── services/        # ecpay.js：綠界簽章、付款表單欄位、QueryTradeInfo 查詢；cartService.js：登入／註冊時合併訪客購物車
+│   └── utils/           # shipping.js：運費規則與計算（純函式）；schemaMigrations.js：orders 運費欄位補欄位
 ├── views/
 │   ├── layouts/         # front.ejs、admin.ejs（載入 Vue CDN 與共用 JS）
 │   ├── partials/        # head、header、footer、notification、admin-header、admin-sidebar
@@ -25,15 +26,15 @@
 │   ├── js/pages/        # 每頁一支 Vue createApp 腳本，檔名對應 pageScript
 │   ├── css/             # input.css（Tailwind 主題色）→ output.css（建置產物，已 gitignore）
 │   └── stylesheets/     # style.css（目前沒有任何模板引用）
-└── tests/               # setup.js（輔助函式）+ 6 個 *.test.js
+└── test/                # setup.js（輔助函式）+ 17 個 *.test.js（見 TESTING.md）
 ```
 
 ## 啟動流程
 
 1. `server.js` 載入 `app.js`；`app.js` 先 `dotenv.config()`。
-2. `require('./src/database')`：開啟資料庫（預設 `database.sqlite`，可用 `DB_PATH` 覆寫）、`journal_mode = WAL`、`foreign_keys = ON`，`CREATE TABLE IF NOT EXISTS` 建 6 張表，再 seed 管理員與商品。
+2. `require('./src/database')`：開啟資料庫（預設 `database.sqlite`，可用 `DB_PATH` 覆寫）、`journal_mode = WAL`、`foreign_keys = ON`，`CREATE TABLE IF NOT EXISTS` 建 6 張表、`addOrderShippingColumns` 補 `orders` 運費欄位，再 seed 管理員與商品。
 3. 設定 EJS（`views/`）、靜態檔（`public/`）、`cors`（`origin: FRONTEND_URL`，預設 `http://localhost:3001`）、`express.json()`、`express.urlencoded()`、`sessionMiddleware`。
-4. 掛載路由（順序）：`/api/auth`、`/api/admin/products`、`/api/admin/orders`、`/api/products`、`/api/cart`、`/api/orders`（`orderRoutes`，再接同前綴的 `ecpayRoutes`），最後 `/` 頁面路由（含 `POST /ecpay/return`）。
+4. 掛載路由（順序）：`/api/auth`、`/api/admin/products`、`/api/admin/orders`、`/api/products`、`/api/cart`、`/api/shipping`、`/api/orders`（`orderRoutes`，再接同前綴的 `ecpayRoutes`），最後 `/` 頁面路由（含 `POST /ecpay/return`）。
 5. 404：路徑以 `/api` 開頭回 JSON `NOT_FOUND`，否則渲染 `pages/404`（套用 front 版面）；最後掛 `errorHandler`。
 6. `JWT_SECRET` 只在 `node server.js` 直接執行時檢查；測試 `require('../app')` 不會檢查，由 `vitest.config.js` 的 `test.env` 提供測試用的值。
 
@@ -61,7 +62,7 @@
 
 | error 碼 | HTTP | 出現情境 |
 |----------|------|----------|
-| `VALIDATION_ERROR` | 400 | 欄位缺漏或格式錯誤 |
+| `VALIDATION_ERROR` | 400 | 欄位缺漏或格式錯誤（含配送選項、運費試算參數） |
 | `STOCK_INSUFFICIENT` | 400 | 加入購物車、改數量、結帳時庫存不足 |
 | `CART_EMPTY` | 400 | 結帳時購物車為空 |
 | `INVALID_STATUS` | 400 | 付款時訂單狀態不是 `pending` |

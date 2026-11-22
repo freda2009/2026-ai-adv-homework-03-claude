@@ -9,6 +9,7 @@
 | `/api/auth` | `authRoutes.js` | 僅 `/profile` 需要 Bearer | 註冊、登入、個人資料 |
 | `/api/products` | `productRoutes.js` | 無 | 公開商品列表與詳情 |
 | `/api/cart` | `cartRoutes.js` | 雙模式（Bearer 或 `X-Session-Id`） | 購物車 |
+| `/api/shipping` | `shippingRoutes.js` | 無 | 運費試算 |
 | `/api/orders` | `orderRoutes.js` | Bearer（`router.use(authMiddleware)`） | 自己的訂單、建立 |
 | `/api/orders/:id/ecpay` | `ecpayRoutes.js` | Bearer（每個端點各自掛 `authMiddleware`） | 綠界付款：建立交易、查詢驗證 |
 | `/api/admin/products` | `adminProductRoutes.js` | Bearer + admin | 後台商品 CRUD |
@@ -27,7 +28,8 @@
 | POST | `/api/cart` | 200 | 加入商品（已存在則累加數量） |
 | PATCH | `/api/cart/:itemId` | 200 | 修改數量（覆蓋，不是累加） |
 | DELETE | `/api/cart/:itemId` | 200 | 移除項目 |
-| POST | `/api/orders` | 201 | 由購物車建立訂單 |
+| GET | `/api/shipping/quote` | 200 | 運費試算：`subtotal`（必填）、`shippingMethod`、`isRemoteArea`、`isUrgent`；不讀寫資料庫 |
+| POST | `/api/orders` | 201 | 由購物車建立訂單；後端計算運費，`total_amount = subtotal_amount + shipping_fee` |
 | GET | `/api/orders` | 200 | 自己的訂單列表（無分頁） |
 | GET | `/api/orders/:id` | 200 | 自己的訂單詳情（含 items） |
 | POST | `/api/orders/:id/ecpay/checkout` | 201 | 建立綠界付款交易，回傳要 POST 到綠界的 `{ action, method, fields }` |

@@ -1,6 +1,6 @@
 # 作業1:花漾生活 Flower Life
 
-花卉電商示範專案：訪客可瀏覽商品、加入購物車；登入後可結帳並以綠界（ECPay）付款；管理員可管理商品與查看訂單。
+花卉電商示範專案：訪客可瀏覽商品、加入購物車；登入後可選擇配送方式（宅配／超商取貨，含偏遠地區與當日急件加價）結帳，運費由後端計算並計入訂單總額，再以綠界（ECPay）付款；管理員可管理商品與查看訂單。
 
 ## 技術棧
 
@@ -33,7 +33,7 @@ npm start                 # 建置 CSS 並啟動，http://localhost:3001
 | `npm run dev:css` | Tailwind 監聽模式（輸出 `public/css/output.css`） |
 | `npm run css:build` | Tailwind 壓縮建置 |
 | `npm run openapi` | 產生 `openapi.json`（寫在專案根目錄） |
-| `npm test` | `vitest run` |
+| `npm test` | `vitest run`（測試在 `test/`） |
 
 ## 文件索引
 
@@ -43,7 +43,7 @@ npm start                 # 建置 CSS 並啟動，http://localhost:3001
 | [architecture/api-routes.md](./architecture/api-routes.md) | 完整路由表 |
 | [architecture/database.md](./architecture/database.md) | 資料表 schema、seed 資料 |
 | [DEVELOPMENT.md](./DEVELOPMENT.md) | 命名規則、環境變數、新增功能與計畫歸檔流程 |
-| [FEATURES.md](./FEATURES.md) | 功能總覽；細節見 [features/](./features/) |
+| [FEATURES.md](./FEATURES.md) | 功能總覽；細節見 [features/](./features/)（運費規則：[features/shipping.md](./features/shipping.md)） |
 | [TESTING.md](./TESTING.md) | 測試檔案、輔助函式、陷阱 |
 | [CHANGELOG.md](./CHANGELOG.md) | 更新日誌 |
 | [plans/](./plans/) | 進行中計畫；已完成的在 `plans/archive/` |

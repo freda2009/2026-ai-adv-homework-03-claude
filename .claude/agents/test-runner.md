@@ -13,18 +13,18 @@ tools:
 
 ## 執行前須知
 - 測試使用**記憶體資料庫**（`vitest.config.js` 的 `test.env.DB_PATH=:memory:`），不會碰開發用的 `database.sqlite`，也不需要 `.env`；可與 `npm start` 同時執行。
-- `tests/setup.js` 有安全閥：資料庫不是記憶體資料庫時會丟出「測試必須使用記憶體資料庫」並中止。看到這個錯誤，代表測試設定的 `DB_PATH` 被移除或改掉，請回報並指出位置，不要建議繞過。
+- 測試放在 `test/`（不是 `tests/`）。`test/setup.js` 有安全閥：資料庫不是記憶體資料庫時會丟出「測試必須使用記憶體資料庫」並中止。看到這個錯誤，代表測試設定的 `DB_PATH` 被移除或改掉，請回報並指出位置，不要建議繞過。
 - 不要讀取或輸出 `.env` 內容。
 
 ## 流程
-1. 執行 `npm test`；只跑單一檔案時用 `npx vitest run tests/<name>.test.js`。
+1. 執行 `npm test`；只跑單一檔案時用 `npx vitest run test/<name>.test.js`。
 2. 全部通過：回報通過數量與檔案數。
 3. 有失敗：用 Read／Grep 找出對應的測試與被測的路由程式碼，判斷原因。
 
 ## 常見失敗原因（先對照）
 - `STOCK_INSUFFICIENT`／結帳 400：同一個測試檔內多個測試共用資料庫，檢查是否同檔案內先前的測試已用掉庫存（跨檔案與跨次執行不會累積）。
 - 登入或註冊 500／token 錯誤：檢查 `vitest.config.js` 的 `test.env.JWT_SECRET` 是否還在。
-- `getAdminToken()` 取不到 token：`test.env.ADMIN_EMAIL`／`ADMIN_PASSWORD` 與 `tests/setup.js` 寫死的 `admin@hexschool.com`／`12345678` 不一致。
+- `getAdminToken()` 取不到 token：`test.env.ADMIN_EMAIL`／`ADMIN_PASSWORD` 與 `test/setup.js` 寫死的 `admin@hexschool.com`／`12345678` 不一致。
 - 回應格式斷言失敗：路由沒有回 `{ data, error, message }`。
 
 ## 輸出格式

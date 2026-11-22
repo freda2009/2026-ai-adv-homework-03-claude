@@ -37,7 +37,10 @@
       <div class="text-sm space-y-2 text-text-secondary">
         <p>收件人：{{ order.recipient_name }}</p>
         <p>Email：{{ order.recipient_email }}</p>
-        <p>地址：{{ order.recipient_address }}</p>
+        <p>{{ order.shipping_method === 'convenience_store' ? '取貨門市' : '地址' }}：{{ order.recipient_address }}</p>
+        <p v-if="order.shipping_method">
+          配送方式：{{ shippingMethodLabels[order.shipping_method] }}<template v-if="order.remote_surcharge > 0">・偏遠地區</template><template v-if="order.urgent_surcharge > 0">・當日急件</template>
+        </p>
       </div>
     </div>
 
@@ -62,6 +65,26 @@
           </tr>
         </tbody>
         <tfoot>
+          <tr>
+            <td colspan="3" class="pt-3 text-right text-text-secondary">商品小計</td>
+            <td class="pt-3 text-right text-text-primary">NT$ {{ order.subtotal_amount.toLocaleString() }}</td>
+          </tr>
+          <tr>
+            <td colspan="3" class="pt-1 text-right text-text-secondary">
+              {{ order.shipping_method ? shippingMethodLabels[order.shipping_method] + '運費' : '運費' }}
+            </td>
+            <td class="pt-1 text-right text-text-primary">
+              {{ order.shipping_method === 'home_delivery' && order.base_shipping_fee === 0 ? '免運' : 'NT$ ' + order.base_shipping_fee.toLocaleString() }}
+            </td>
+          </tr>
+          <tr v-if="order.remote_surcharge > 0">
+            <td colspan="3" class="pt-1 text-right text-text-secondary">偏遠地區加收</td>
+            <td class="pt-1 text-right text-text-primary">NT$ {{ order.remote_surcharge.toLocaleString() }}</td>
+          </tr>
+          <tr v-if="order.urgent_surcharge > 0">
+            <td colspan="3" class="pt-1 text-right text-text-secondary">當日急件加收</td>
+            <td class="pt-1 text-right text-text-primary">NT$ {{ order.urgent_surcharge.toLocaleString() }}</td>
+          </tr>
           <tr>
             <td colspan="3" class="pt-3 text-right font-bold text-text-primary">總計</td>
             <td class="pt-3 text-right font-bold text-rose-primary text-lg">NT$ {{ order.total_amount.toLocaleString() }}</td>

@@ -17,6 +17,12 @@ createApp({
       failed: { label: '付款失敗', cls: 'bg-red-100 text-red-800' },
     };
 
+    // 配送方式顯示名稱；shipping_method 為 null 的是運費功能上線前的舊訂單。
+    const shippingMethodLabels = {
+      home_delivery: '宅配',
+      convenience_store: '超商取貨',
+    };
+
     async function loadOrders(page) {
       page = page || 1;
       loading.value = true;
@@ -58,7 +64,7 @@ createApp({
     return {
       orders, pagination, loading, statusFilter,
       detailVisible, detailOrder, detailLoading,
-      statusMap, loadOrders, viewDetail
+      statusMap, shippingMethodLabels, loadOrders, viewDetail
     };
   }
 }).mount('#app');

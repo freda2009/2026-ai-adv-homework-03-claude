@@ -45,9 +45,14 @@ SQLite，預設檔案為專案根目錄的 `database.sqlite`；可用環境變�
 | order_no | TEXT | UNIQUE NOT NULL，格式 `ORD-YYYYMMDD-XXXXX`（日期為 UTC，XXXXX 為 uuid 前 5 碼大寫） |
 | user_id | TEXT | NOT NULL，FK → `users(id)` |
 | recipient_name / recipient_email / recipient_address | TEXT | NOT NULL |
-| total_amount | INTEGER | NOT NULL |
+| total_amount | INTEGER | NOT NULL；`subtotal_amount + shipping_fee`（綠界付款金額） |
 | status | TEXT | NOT NULL DEFAULT `'pending'`，CHECK IN (`pending`, `paid`, `failed`) |
 | created_at | TEXT | NOT NULL DEFAULT `datetime('now')` |
+| subtotal_amount | INTEGER | NOT NULL DEFAULT 0，CHECK `>= 0`；商品小計 |
+| shipping_method | TEXT | CHECK `IS NULL OR IN ('home_delivery', 'convenience_store')`；`NULL`＝運費功能上線前的舊訂單 |
+| base_shipping_fee / remote_surcharge / urgent_surcharge / shipping_fee | INTEGER | NOT NULL DEFAULT 0，CHECK `>= 0`；運費明細快照，`shipping_fee` 為三者合計 |
+
+運費欄位（最後 6 欄）不在 `CREATE TABLE` 內，而是由 `src/utils/schemaMigrations.js` 的 `addOrderShippingColumns(db)` 補上：以 `PRAGMA table_info` 檢查，缺少才 `ALTER TABLE ADD COLUMN`，可重複執行；新增 `subtotal_amount` 時把既有訂單回填為原本的 `total_amount`（舊訂單沒有運費）。全新與既有的 `database.sqlite` 都走同一路徑，不需要刪檔重建。規則見 [../features/shipping.md](../features/shipping.md)。
 
 ### order_items
 | 欄位 | 型別 | 約束 |

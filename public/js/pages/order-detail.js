@@ -41,6 +41,12 @@ createApp({
       failed: { label: '付款失敗', cls: 'bg-red-100 text-red-600' },
     };
 
+    // 配送方式顯示名稱；shipping_method 為 null 的是運費功能上線前的舊訂單。
+    const shippingMethodLabels = {
+      home_delivery: '宅配',
+      convenience_store: '超商取貨',
+    };
+
     const paymentMessages = {
       checking: { text: '正在向綠界確認付款結果…', cls: 'bg-gray-50 text-text-secondary border border-gray-100' },
       success: { text: '付款成功！感謝您的購買。', cls: 'bg-sage/10 text-sage border border-sage/20' },
@@ -111,7 +117,7 @@ createApp({
 
     return {
       order, loading, paying, verifying, paymentResult, verifyMessage, statusMap, paymentMessages,
-      startCheckout, verifyPayment
+      shippingMethodLabels, startCheckout, verifyPayment
     };
   }
 }).mount('#app');

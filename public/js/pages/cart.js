@@ -1,4 +1,4 @@
-const { createApp, ref, computed, onMounted } = Vue;
+const { createApp, ref, computed, watch, onMounted } = Vue;
 
 createApp({
   setup() {
@@ -11,6 +11,24 @@ createApp({
       return items.value.reduce(function (sum, item) {
         return sum + item.product.price * item.quantity;
       }, 0);
+    });
+
+    // 預估運費（宅配、非偏遠、非急件）：由後端試算 API 計算，前端不寫死費率。
+    // 配送方式、偏遠地區與當日急件在結帳頁選擇。
+    const quote = ref(null);
+    let quoteSeq = 0;
+    async function refreshQuote() {
+      const seq = ++quoteSeq;
+      try {
+        const res = await apiFetch('/api/shipping/quote?subtotal=' + encodeURIComponent(total.value));
+        if (seq === quoteSeq) quote.value = res.data;
+      } catch (e) {
+        if (seq === quoteSeq) quote.value = null;
+      }
+    }
+    // 數量變更、移除商品、載入購物車都會改變小計，統一在這裡重新試算。
+    watch(total, function (value) {
+      if (value > 0) refreshQuote();
     });
 
     async function loadCart() {
@@ -68,7 +86,7 @@ createApp({
     });
 
     return {
-      items, loading, total, confirmVisible,
+      items, loading, total, quote, confirmVisible,
       updateQuantity, confirmDelete, handleDelete, goCheckout
     };
   }

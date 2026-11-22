@@ -34,16 +34,66 @@
             <p v-if="errors.recipientEmail" class="text-red-500 text-xs mt-1">{{ errors.recipientEmail }}</p>
           </div>
           <div>
-            <label class="block text-sm text-text-secondary mb-1">收件地址</label>
+            <label class="block text-sm text-text-secondary mb-1">{{ form.shippingMethod === 'convenience_store' ? '取貨門市' : '收件地址' }}</label>
             <input
               v-model="form.recipientAddress"
               type="text"
-              placeholder="請輸入收件地址"
+              :placeholder="form.shippingMethod === 'convenience_store' ? '請輸入取貨門市名稱與地址' : '請輸入收件地址'"
               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-rose-primary transition-colors"
               :class="{ 'border-red-400': errors.recipientAddress }"
             />
             <p v-if="errors.recipientAddress" class="text-red-500 text-xs mt-1">{{ errors.recipientAddress }}</p>
           </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm p-6 mt-6">
+        <h2 class="font-medium text-text-primary mb-4">配送方式</h2>
+        <div class="space-y-3">
+          <label
+            class="flex items-start gap-3 border rounded-lg px-4 py-3 cursor-pointer transition-colors"
+            :class="form.shippingMethod === 'home_delivery' ? 'border-rose-primary bg-rose-bg' : 'border-gray-200'"
+          >
+            <input type="radio" value="home_delivery" v-model="form.shippingMethod" @change="refreshQuote" class="mt-1 accent-rose-primary" />
+            <span>
+              <span class="block text-sm text-text-primary">宅配</span>
+              <span v-if="quote" class="block text-xs text-text-muted">
+                基本運費 NT$ {{ quote.rates.home_delivery_fee.toLocaleString() }}；商品小計滿 NT$ {{ quote.rates.free_shipping_threshold.toLocaleString() }} 免基本運費
+              </span>
+            </span>
+          </label>
+          <label
+            class="flex items-start gap-3 border rounded-lg px-4 py-3 cursor-pointer transition-colors"
+            :class="form.shippingMethod === 'convenience_store' ? 'border-rose-primary bg-rose-bg' : 'border-gray-200'"
+          >
+            <input type="radio" value="convenience_store" v-model="form.shippingMethod" @change="refreshQuote" class="mt-1 accent-rose-primary" />
+            <span>
+              <span class="block text-sm text-text-primary">超商取貨</span>
+              <span v-if="quote" class="block text-xs text-text-muted">
+                NT$ {{ quote.rates.convenience_store_fee.toLocaleString() }}（不適用滿額免運）
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <h3 class="text-sm text-text-secondary mt-5 mb-3">附加服務</h3>
+        <div class="space-y-3">
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" v-model="form.isRemoteArea" @change="refreshQuote" class="mt-1 accent-rose-primary" />
+            <span>
+              <span class="block text-sm text-text-primary">偏遠地區</span>
+              <span class="block text-xs text-text-muted">
+                收件地址或取貨門市位於偏遠地區（如離島）請勾選<template v-if="quote">，加收 NT$ {{ quote.rates.remote_area_surcharge.toLocaleString() }}</template>
+              </span>
+            </span>
+          </label>
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" v-model="form.isUrgent" @change="refreshQuote" class="mt-1 accent-rose-primary" />
+            <span>
+              <span class="block text-sm text-text-primary">當日急件</span>
+              <span v-if="quote" class="block text-xs text-text-muted">加收 NT$ {{ quote.rates.urgent_surcharge.toLocaleString() }}</span>
+            </span>
+          </label>
         </div>
       </div>
     </div>
@@ -63,17 +113,32 @@
             <span class="text-text-secondary">商品小計</span>
             <span>NT$ {{ cartTotal.toLocaleString() }}</span>
           </div>
-          <div class="flex justify-between">
+          <template v-if="quote">
+            <div class="flex justify-between">
+              <span class="text-text-secondary">{{ quote.shipping_method === 'convenience_store' ? '超商取貨' : '宅配運費' }}</span>
+              <span>{{ quote.free_shipping_applied ? '免運' : 'NT$ ' + quote.base_shipping_fee.toLocaleString() }}</span>
+            </div>
+            <div v-if="quote.remote_surcharge > 0" class="flex justify-between">
+              <span class="text-text-secondary">偏遠地區加收</span>
+              <span>NT$ {{ quote.remote_surcharge.toLocaleString() }}</span>
+            </div>
+            <div v-if="quote.urgent_surcharge > 0" class="flex justify-between">
+              <span class="text-text-secondary">當日急件加收</span>
+              <span>NT$ {{ quote.urgent_surcharge.toLocaleString() }}</span>
+            </div>
+          </template>
+          <div v-else class="flex justify-between">
             <span class="text-text-secondary">運費</span>
-            <span>{{ cartTotal >= 500 ? '免運' : 'NT$ 150' }}</span>
+            <span class="text-text-muted">{{ quoteFailed ? '將於建立訂單時計算' : '計算中…' }}</span>
           </div>
         </div>
         <div class="border-t border-gray-100 pt-3 mt-3 flex justify-between items-center">
           <span class="font-bold text-text-primary">總計</span>
           <span class="font-bold text-xl text-rose-primary">
-            NT$ {{ (cartTotal + (cartTotal >= 500 ? 0 : 150)).toLocaleString() }}
+            {{ quote ? 'NT$ ' + quote.total_amount.toLocaleString() : '—' }}
           </span>
         </div>
+        <p class="text-xs text-text-muted mt-2">實際金額以建立訂單時計算為準。</p>
         <button
           @click="submitOrder"
           :disabled="submitting"

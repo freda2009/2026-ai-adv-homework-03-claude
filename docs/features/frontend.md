@@ -33,15 +33,15 @@
 |------|------|
 | 首頁 | `limit=9` 分頁；「加入購物車」成功後前端自行把徽章 +1（不重新請求） |
 | 商品詳情 | 數量選擇器上限為商品 `stock`；加入購物車後徽章 +1 |
-| 購物車 | 修改數量呼叫 PATCH；結帳前未登入導向 `/login?redirect=/checkout` |
-| 結帳 | `Auth.requireAuth()`；購物車為空就導回 `/cart`；**收件人姓名與 Email 預填登入帳號的 `Auth.getUser()`**（可自行修改，地址仍須自填）；成功後導向 `/orders/<id>` |
+| 購物車 | 修改數量呼叫 PATCH；小計變動時呼叫 `GET /api/shipping/quote` 顯示宅配免運差額與預估運費；結帳前未登入導向 `/login?redirect=/checkout` |
+| 結帳 | `Auth.requireAuth()`；購物車為空就導回 `/cart`；**收件人姓名與 Email 預填登入帳號的 `Auth.getUser()`**（可自行修改，地址仍須自填）；配送方式與偏遠／急件選項切換時呼叫試算 API 更新摘要（見 [shipping.md](./shipping.md)）；成功後導向 `/orders/<id>` |
 | 登入 | 登入／註冊兩個分頁；成功後導向 `?redirect=` 或 `/` |
-| 訂單詳情 | 「前往綠界付款」呼叫 checkout 並以 `createElement` 建隱藏表單全頁 POST 到綠界；「重新查詢付款結果」呼叫 verify。`?payment=checking` 時載入後自動查詢；網址上其他 `payment` 值一律忽略（結果以後端為準） |
+| 訂單詳情 | 顯示商品小計、配送方式與運費明細、總計；「前往綠界付款」呼叫 checkout 並以 `createElement` 建隱藏表單全頁 POST 到綠界；「重新查詢付款結果」呼叫 verify。`?payment=checking` 時載入後自動查詢；網址上其他 `payment` 值一律忽略（結果以後端為準） |
 | 後台商品 | 列表、新增／編輯 modal、刪除確認 |
-| 後台訂單 | 狀態篩選、分頁、詳情 modal |
+| 後台訂單 | 狀態篩選、分頁、詳情 modal（含運費明細） |
 
 ## 已知陷阱
 
 - 新增「帳密驗證型」的端點（回 401 但不代表登入過期）時，要比照登入／註冊，把它加進 `api.js` 的 `isCredentialRequest` 判斷，否則會被導向 `/login`。
-- 前端腳本沒有瀏覽器測試環境；`tests/apiFetch.test.js`、`tests/headerInit.test.js` 以 Node `vm` 注入假的 DOM 與 `fetch` 驗證邏輯，不等於瀏覽器實機驗證。
+- 前端腳本沒有瀏覽器測試環境；`test/apiFetch.test.js`、`test/headerInit.test.js`、`test/checkoutPage.test.js` 等以 Node `vm` 注入假的 DOM 與 `fetch` 驗證邏輯，不等於瀏覽器實機驗證。
 - Tailwind 的自訂色（`rose-primary`、`sage`、`apricot`、`cream` 等）定義在 `public/css/input.css` 的 `@theme`；新增樣式後必須重新 `npm run css:build`（或開 `dev:css`）。

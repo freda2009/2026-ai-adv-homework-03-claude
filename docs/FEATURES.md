@@ -8,6 +8,7 @@
 | 商品（公開） | 列表分頁、詳情 | 本檔 |
 | 購物車 | 訪客（session）與登入者雙模式，累加與庫存檢查 | [features/cart.md](./features/cart.md) |
 | 訂單 | 由購物車結帳（transaction 扣庫存）、訂單列表與詳情 | [features/orders.md](./features/orders.md) |
+| 配送費用 | 宅配 120（滿 1,500 免基本運費）、超商取貨 60、偏遠 +200、急件 +250；後端計算並寫入訂單，提供試算 API | [features/shipping.md](./features/shipping.md) |
 | 綠界付款 | 建立付款交易、後端主動呼叫 QueryTradeInfo 驗證後才更新訂單為 paid | [features/payment-ecpay.md](./features/payment-ecpay.md) |
 | 後台 | 商品 CRUD、訂單查詢與狀態篩選 | [features/admin.md](./features/admin.md) |
 | 前端頁面 | Auth 物件、apiFetch、頁面腳本慣例 | [features/frontend.md](./features/frontend.md) |

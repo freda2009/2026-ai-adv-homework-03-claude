@@ -17,6 +17,7 @@
 - 只能對自己的 `pending` 訂單（否則 404／400 `INVALID_STATUS`）。
 - 每次呼叫產生新的 `MerchantTradeNo`（綠界永久唯一）：`P` + UTC+8 `yyMMddHHmmss` + 5 碼隨機＝18 字，並寫入 `payments`（`created`）。
 - 建立前先查詢該訂單最近 3 筆未完成的舊交易（10 秒內查過的略過）：已付款則標為 paid 並回 409，避免重複付款；查詢失敗不阻擋。
+- `TotalAmount` 為 `order.total_amount`，已包含運費（`subtotal_amount + shipping_fee`，見 [shipping.md](./shipping.md)）。
 - 欄位：`MerchantTradeDate` 為 UTC+8；`ItemName` 以 `#` 串接「商品名 x數量」，移除 `# < > & + % =` 與控制字元並截至 200 字；`EncryptType=1`；`ReturnURL` 必填但本機收不到（預設 `${BASE_URL}/api/ecpay/notify`，未實作該端點）。
 
 ## verify（200）：全部成立才變 paid
@@ -52,7 +53,7 @@
 - 沒有退款、對帳、發票；失敗的交易不會還原庫存。
 
 ## 綠界 skill
-`.claude/skills/ecpay` 以 **git submodule** 引用綠界官方 repo（`https://github.com/ECPay/ECPay-API-Skill.git`），只記錄指標、不複製內容：該 repo 授權為 All Rights Reserved，禁止重新散布。取得專案後執行 `git submodule update --init`，或 clone 時加 `--recurse-submodules`。`tests/ecpay.test.js` 會讀取其中的 `test-vectors/checkmacvalue.json`，submodule 未初始化時略過該組測試。
+`.claude/skills/ecpay` 以 **git submodule** 引用綠界官方 repo（`https://github.com/ECPay/ECPay-API-Skill.git`），只記錄指標、不複製內容：該 repo 授權為 All Rights Reserved，禁止重新散布。取得專案後執行 `git submodule update --init`，或 clone 時加 `--recurse-submodules`。`test/ecpay.test.js` 會讀取其中的 `test-vectors/checkmacvalue.json`，submodule 未初始化時略過該組測試。
 
 ## 上線前
 正式環境改用 `ECPAY_ENV=production` 與正式的 MerchantID／HashKey／HashIV（只放環境變數）；需要可公開存取的 https 網址與接收 Server Notify 的端點，並重新確認官方規格。
