@@ -33,7 +33,7 @@
   - YAML：`yaml` 套件嚴格模式解析＋SchemaStore `github-workflow.json`（ajv）驗證通過；另以 4 種故意寫壞的版本（缺 `runs-on`、同時有 `uses` 與 `run`、鍵名錯字、縮排錯誤）確認驗證會失敗。
   - 本機模擬：乾淨 clone＋官方 Node 24.22.3（核對 SHA256）＋`npm ci`：unit 89、integration 96 通過，未產生 `database.sqlite`。
   - GitHub Actions：run 45206954603（push `feature/github-actions`）**success**，約 20 秒；Node 24.22.3、submodule `e8cc595`、unit 89、integration 96，沒有警告或錯誤註記。
+  - 合併回 `main`（快轉至 `2e8e757`）並推送後，`main` 的 run [45208294946](https://github.com/freda2009/2026-ai-adv-homework-03-claude/actions/runs/45208294946) 與 `feature/github-actions` 的 run 45208293975 皆 **success**（unit 89、integration 96）；之後已刪除本機的 `feature/github-actions`、`feature/shipping-fee`。
 - 文件更新：TESTING（新增 CI 章節）、README、ARCHITECTURE、DEVELOPMENT、CLAUDE.md、CHANGELOG、`.claude/rules/testing.md`。
 - 遺留事項：
-  - `feature/github-actions` 尚未合併回 `main`；合併並推送 `main` 後會再觸發一次 Actions。
   - npm 11.19 對 better-sqlite3、bcrypt、esbuild、@parcel/watcher 的安裝腳本顯示 `install-scripts` 提醒（目前仍會執行）；若日後 npm 預設封鎖安裝腳本，需在 `package.json` 允許這幾個套件，否則 better-sqlite3 會缺少原生模組。
