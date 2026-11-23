@@ -41,3 +41,22 @@ public/css/output.css
 
 # 由 npm run openapi（及 auto-api-docs hook）產生的 OpenAPI 文件
 openapi.json
+
+# 測試產物：影片、截圖、Trace、報告與暫存資料（Vitest、Playwright 等工具產生，不提交）
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/html/
+/reports/
+junit*.xml
+/screenshots/
+/videos/
+/traces/
+*.webm
+trace.zip
+*.trace.zip
+/tmp/
+/temp/
+.tmp/
