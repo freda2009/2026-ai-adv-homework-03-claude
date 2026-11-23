@@ -4,6 +4,7 @@ paths:
   - "vitest.config.js"
   - "playwright.config.js"
   - "scripts/generate-postman.js"
+  - ".github/workflows/**"
 ---
 
 # 測試規則（Vitest + supertest + Playwright）
@@ -11,6 +12,7 @@ paths:
 - 位置（資料夾是 `test/`，不是 `tests/`）：純邏輯與前端 vm 測試放 `test/unit/`；API 測試放 `test/integration/<資源>.test.js`，開頭 `const { app, request, getAdminToken, registerUser } = require('./setup');`；瀏覽器測試放 `test/e2e/*.spec.js`（Playwright，Vitest 已排除）。`globals: true`，不需 import `describe`／`it`／`expect`。
 - 指令：`npm run test:unit`、`npm run test:integration`、`npm test`（兩者）、`npm run test:e2e`（需先 `npm start`，會在開發資料庫建立真實訂單）。
 - 新的 integration 測試要自建自清：比照 `test/integration/checkoutFlow.test.js`，用 `testData.js` 的 `createMember()`、`snapshotStock()`，在 `afterEach` 以 `deleteMemberData()`、`restoreStock()` 清除並確認沒有殘留。
+- CI（`.github/workflows/test.yml`）以 Node 24 執行 `npm ci`、`test:unit`、`test:integration`，checkout 含 submodule；unit／integration 不可依賴 `.env`、已啟動的伺服器、`database.sqlite` 或未提交的檔案。CI 不跑 E2E。改 Node 版本前確認 `better-sqlite3` 有該版本的預編譯檔。
 - E2E 不可設定 `webServer`、不可另外啟動伺服器；綠界頁面的選擇器用文字比對並搜尋所有分頁／iframe。
 - `npm run postman` 產生的 `postman/` 已列入 `.gitignore`，不提交；`test/unit/postmanCollection.test.js` 直接由路由的 `@openapi` 註解在記憶體產生 collection 檢查，不讀該檔。
 - 需要使用者用 `registerUser()`（隨機 email）；需要管理員用 `getAdminToken()`（寫死 `admin@hexschool.com`／`12345678`）。

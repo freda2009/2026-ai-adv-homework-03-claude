@@ -4,6 +4,12 @@
 
 ## 2026-11-23
 
+### CI：GitHub Actions 自動測試
+- 新增 `.github/workflows/test.yml`：push 任何分支、對 `main` 的 PR、手動觸發時，以 Node 24 執行 `npm ci`、`npm run test:unit`、`npm run test:integration`（兩個獨立步驟）；不跑 E2E、不啟動伺服器、不需要 secrets。
+- checkout 含 submodule `.claude/skills/ecpay`，讓綠界官方 CheckMacValue 向量測試在 CI 也會執行。
+- 以乾淨 clone＋Node 24.22.3＋`npm ci` 模擬：unit 89、integration 96 全數通過。
+- 計畫：[github-actions-ci](./plans/2026-11-23-github-actions-ci.md)
+
 ### 測試：完整測試流程（Integration、E2E、Postman）
 - 測試分成 `test/unit`、`test/integration`、`test/e2e`；新增 `npm run test:unit`、`test:integration`、`test:e2e`、`postman`（`npm test` 仍執行 unit＋integration）。
 - **Integration**：新增 `test/integration/checkoutFlow.test.js`（9）與 `testData.js`：每個測試自建會員、自清資料並還原庫存；檢查回應格式、`orders`／`order_items` 寫入、運費與總額、庫存扣除、購物車清空，以及失敗時（含以 trigger 模擬交易中途失敗）不留訂單、不扣庫存。實測執行前後 `database.sqlite` 雜湊值不變。

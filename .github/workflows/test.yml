@@ -1,0 +1,48 @@
+# 程式碼更新時自動執行 Unit Test 與 Integration Test。
+# 不執行 Playwright E2E、不啟動任何伺服器；測試使用記憶體 SQLite，
+# 測試用環境變數寫在 vitest.config.js，所以不需要 .env 或任何 secrets。
+name: Test
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Unit & Integration Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # 一併取得 submodule .claude/skills/ecpay（公開 repo）：test/unit/ecpay.test.js 的綠界官方
+      # CheckMacValue 測試向量在裡面，沒有 submodule 時這 7 個測試會被略過
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      # better-sqlite3 12.8.0 只支援 Node 20～25（Node 26 沒有預編譯檔），使用 Node 24 LTS
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit Test
+        run: npm run test:unit
+
+      - name: Integration Test
+        run: npm run test:integration

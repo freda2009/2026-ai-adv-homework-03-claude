@@ -69,7 +69,7 @@
 1. 在對應的 `src/routes/*.js` 新增 handler；回應必須是 `{ data, error, message }`。
 2. 需登入掛 `authMiddleware`；後台再加 `adminMiddleware`。新資源就建立新的 `*Routes.js`，並在 `app.js` 掛載（`/api/admin/*` 要寫在 `/api/<資源>` 之前，目前沒有衝突但請維持）。
 3. 寫 `@openapi` 註解，更新 [architecture/api-routes.md](./architecture/api-routes.md) 與 [FEATURES.md](./FEATURES.md)。
-4. 在 `test/integration/` 補測試（純邏輯放 `test/unit/`，見 [TESTING.md](./TESTING.md)）。需要 Postman Collection 時執行 `npm run postman` 重新產生（不提交）。
+4. 在 `test/integration/` 補測試（純邏輯放 `test/unit/`，見 [TESTING.md](./TESTING.md)）。需要 Postman Collection 時執行 `npm run postman` 重新產生（不提交）。推上 GitHub 後，Actions 會自動執行 unit＋integration（見 [TESTING.md](./TESTING.md#cigithub-actions)）。
 
 **新增資料表／欄位**：`src/database.js` 只有 `CREATE TABLE IF NOT EXISTS`，既有的 `database.sqlite` 不會自動加欄位。新增欄位請比照 `src/utils/schemaMigrations.js`（`PRAGMA table_info` 檢查後 `ALTER TABLE ADD COLUMN`，冪等、欄位定義為程式內固定字串）；修改或刪除既有欄位仍沒有遷移機制，需手動處理或刪檔重建。並更新 [architecture/database.md](./architecture/database.md)。
 

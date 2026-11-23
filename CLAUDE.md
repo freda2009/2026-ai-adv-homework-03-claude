@@ -27,6 +27,7 @@ npm run test:e2e         # Playwright，需先 npm start；會在開發資料庫
 - 金額（`price`、`total_amount`、運費）一律是整數，不使用小數。
 - 運費只由後端 `src/utils/shipping.js` 計算（宅配 120、滿 1,500 免基本運費；超商 60；偏遠 +200；急件 +250）；`total_amount = subtotal_amount + shipping_fee`，不接受前端傳入金額；前端預估用 `GET /api/shipping/quote`（見 docs/features/shipping.md）。
 - 測試放在 `test/unit`、`test/integration`、`test/e2e`（不是 `tests/`）；純邏輯模組放 `src/utils/` 並寫單元測試（見 docs/TESTING.md）。
+- CI：`.github/workflows/test.yml` 在 push／PR 時以 Node 24 執行 `test:unit`、`test:integration`；這兩類測試不可依賴 `.env`、已啟動的伺服器或未提交的檔案。
 - 訂單只能由後端呼叫綠界 QueryTradeInfo、驗證通過（CheckMacValue、MerchantTradeNo、金額、`TradeStatus=1`）後變成 `paid`；不信任瀏覽器帶回的付款結果，不新增繞過驗證的付款端點（見 docs/features/payment-ecpay.md）。
 - 功能開發先複製 docs/plans/_template.md 建立計畫；完成後填寫「執行結果」並移至 docs/plans/archive/。
 

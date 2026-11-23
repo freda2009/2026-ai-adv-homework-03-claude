@@ -6,12 +6,12 @@
 
 | 層 | 技術 |
 |----|------|
-| 執行環境 | Node.js（CommonJS，本機測試版本 v25） |
+| 執行環境 | Node.js（CommonJS，本機測試版本 v25；CI 使用 Node 24） |
 | 後端 | Express 4.16、better-sqlite3 12（WAL）、jsonwebtoken、bcrypt、cors、dotenv |
 | 前端 | EJS 5 版面 + Vue 3（unpkg CDN，無打包）、Tailwind CSS 4（CLI 建置） |
 | 金流 | 綠界 ECPay 全方位金流（AIO），測試環境；本機以 QueryTradeInfo 主動查詢驗證付款（見 [features/payment-ecpay.md](./features/payment-ecpay.md)） |
 | API 文件 | swagger-jsdoc（只產出 `openapi.json`，專案內沒有 Swagger UI 路由） |
-| 測試 | Vitest 2 + supertest |
+| 測試 | Vitest 2 + supertest、Playwright（E2E）；GitHub Actions 在 push／PR 時執行 unit＋integration（見 [TESTING.md](./TESTING.md#cigithub-actions)） |
 
 ## 快速開始
 

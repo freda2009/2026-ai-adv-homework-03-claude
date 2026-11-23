@@ -10,6 +10,12 @@
 
 單檔：`npx vitest run test/unit/shipping.test.js`。Vitest 2.1.9（`globals: true`，不需 import `describe`／`it`／`expect`）。
 
+## CI（GitHub Actions）
+`.github/workflows/test.yml`：push 任何分支、對 `main` 的 pull request、手動觸發時，在 `ubuntu-latest`＋Node 24 執行 `npm ci` →「Unit Test」`npm run test:unit` →「Integration Test」`npm run test:integration`。不跑 E2E、不啟動伺服器、不需要 `.env` 或 secrets（`permissions: contents: read`）。
+- checkout 會一併取得 submodule `.claude/skills/ecpay`；沒有它時 `ecpay.test.js` 會略過 7 個綠界官方向量測試（本機 89 個、少 submodule 時 82 個）。
+- Node 版本受 `better-sqlite3` 12.8.0 限制（20～25，Node 26 沒有預編譯檔），升級 Node 前先升級它。
+- 因此 unit／integration 測試不可依賴 `.env`、已啟動的伺服器、`database.sqlite` 或未提交的檔案（如 `openapi.json`、`postman/`）。
+
 ## Vitest 設定（`vitest.config.js`）
 - `include` 只有 `test/unit/**`、`test/integration/**`；`test/e2e/**` 被排除（Playwright 的 `.spec.js` 不能被 Vitest 執行）。
 - `env`：`DB_PATH=:memory:`、測試用 `JWT_SECRET`、`ADMIN_EMAIL`／`ADMIN_PASSWORD`、綠界公開測試帳號與 `BASE_URL`。`dotenv` 不覆寫既有環境變數，所以這些值優先於 `.env`。

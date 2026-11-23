@@ -14,6 +14,7 @@
 ├── playwright.config.js # E2E：測已啟動的 localhost:3001、系統 Chrome、不設定 webServer
 ├── scripts/             # generate-postman.js：openapi.json → Postman Collection
 ├── postman/             # flower-life.postman_collection.json（npm run postman 產生，已 gitignore）
+├── .github/workflows/   # test.yml：GitHub Actions 在 push／PR 時執行 test:unit、test:integration（Node 24）
 ├── src/
 │   ├── database.js      # 連線 database.sqlite、建表、seed；匯出 db 單例
 │   ├── middleware/      # authMiddleware、adminMiddleware、sessionMiddleware、errorHandler
