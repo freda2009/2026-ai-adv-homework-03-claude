@@ -8,7 +8,8 @@
 - 新增 `.github/workflows/test.yml`：push 任何分支、對 `main` 的 PR、手動觸發時，以 Node 24 執行 `npm ci`、`npm run test:unit`、`npm run test:integration`（兩個獨立步驟）；不跑 E2E、不啟動伺服器、不需要 secrets。
 - checkout 含 submodule `.claude/skills/ecpay`，讓綠界官方 CheckMacValue 向量測試在 CI 也會執行。
 - 以乾淨 clone＋Node 24.22.3＋`npm ci` 模擬：unit 89、integration 96 全數通過。
-- 計畫：[github-actions-ci](./plans/2026-11-23-github-actions-ci.md)
+- GitHub Actions 實際執行通過（Node 24.22.3：unit 89、integration 96）。
+- 計畫：[github-actions-ci](./plans/archive/2026-11-23-github-actions-ci.md)
 
 ### 測試：完整測試流程（Integration、E2E、Postman）
 - 測試分成 `test/unit`、`test/integration`、`test/e2e`；新增 `npm run test:unit`、`test:integration`、`test:e2e`、`postman`（`npm test` 仍執行 unit＋integration）。
