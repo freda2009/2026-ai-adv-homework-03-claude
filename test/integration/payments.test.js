@@ -1,6 +1,6 @@
 const { app, request, registerUser } = require('./setup');
-const db = require('../src/database');
-const { generateCheckMacValue, verifyCheckMacValue } = require('../src/services/ecpay');
+const db = require('../../src/database');
+const { generateCheckMacValue, verifyCheckMacValue } = require('../../src/services/ecpay');
 
 const KEY = 'pwFHCqoQZGmho4w6';
 const IV = 'EkRm7iFT261dpevs';

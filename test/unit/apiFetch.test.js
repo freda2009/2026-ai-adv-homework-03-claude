@@ -23,7 +23,7 @@ function loadApiFetch({ status = 200, body = {}, pathname = '/' } = {}) {
     }),
   };
   vm.createContext(ctx);
-  const file = path.join(__dirname, '..', 'public', 'js', 'api.js');
+  const file = path.join(__dirname, '..', '..', 'public', 'js', 'api.js');
   vm.runInContext(fs.readFileSync(file, 'utf8'), ctx);
   return { apiFetch: ctx.apiFetch, ctx, store };
 }

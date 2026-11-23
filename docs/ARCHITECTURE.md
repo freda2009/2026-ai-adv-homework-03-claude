@@ -10,7 +10,10 @@
 ├── app.js               # 組裝 Express：dotenv、載入 DB、中介層、路由、404、errorHandler；匯出 app（測試用）
 ├── swagger-config.js    # OpenAPI 3.0.3 設定，定義 bearerAuth、sessionId（X-Session-Id）兩種 scheme
 ├── generate-openapi.js  # 掃描 ./src/routes/*.js 的 @openapi 註解，寫出 openapi.json
-├── vitest.config.js     # globals、test.env（DB_PATH=:memory: 等）、fileParallelism: false
+├── vitest.config.js     # unit＋integration；test.env（DB_PATH=:memory: 等）、排除 test/e2e
+├── playwright.config.js # E2E：測已啟動的 localhost:3001、系統 Chrome、不設定 webServer
+├── scripts/             # generate-postman.js：openapi.json → Postman Collection
+├── postman/             # flower-life.postman_collection.json（npm run postman 產生，已 gitignore）
 ├── src/
 │   ├── database.js      # 連線 database.sqlite、建表、seed；匯出 db 單例
 │   ├── middleware/      # authMiddleware、adminMiddleware、sessionMiddleware、errorHandler
@@ -26,7 +29,7 @@
 │   ├── js/pages/        # 每頁一支 Vue createApp 腳本，檔名對應 pageScript
 │   ├── css/             # input.css（Tailwind 主題色）→ output.css（建置產物，已 gitignore）
 │   └── stylesheets/     # style.css（目前沒有任何模板引用）
-└── test/                # setup.js（輔助函式）+ 17 個 *.test.js（見 TESTING.md）
+└── test/                # unit/、integration/（setup.js、testData.js）、e2e/（Playwright），見 TESTING.md
 ```
 
 ## 啟動流程
@@ -36,7 +39,7 @@
 3. 設定 EJS（`views/`）、靜態檔（`public/`）、`cors`（`origin: FRONTEND_URL`，預設 `http://localhost:3001`）、`express.json()`、`express.urlencoded()`、`sessionMiddleware`。
 4. 掛載路由（順序）：`/api/auth`、`/api/admin/products`、`/api/admin/orders`、`/api/products`、`/api/cart`、`/api/shipping`、`/api/orders`（`orderRoutes`，再接同前綴的 `ecpayRoutes`），最後 `/` 頁面路由（含 `POST /ecpay/return`）。
 5. 404：路徑以 `/api` 開頭回 JSON `NOT_FOUND`，否則渲染 `pages/404`（套用 front 版面）；最後掛 `errorHandler`。
-6. `JWT_SECRET` 只在 `node server.js` 直接執行時檢查；測試 `require('../app')` 不會檢查，由 `vitest.config.js` 的 `test.env` 提供測試用的值。
+6. `JWT_SECRET` 只在 `node server.js` 直接執行時檢查；測試 `require('../../app')` 不會檢查，由 `vitest.config.js` 的 `test.env` 提供測試用的值。
 
 ## 認證與授權
 

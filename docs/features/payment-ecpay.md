@@ -45,6 +45,7 @@
 - 錯誤的 CheckMacValue 會得到 HTTP 500、`TradeStatus=10200073`，所以 `queryTradeInfo` 對非 2xx 也會把 TradeStatus 帶進錯誤訊息。
 - 建單（`AioCheckOut/V5`）的付款頁在 `http://localhost:3001` 回傳網址下能正常顯示；但**錯誤的 CheckMacValue 也能顯示付款頁**，所以建單簽章是否被檢查要到付款時才知道。
 - **實機驗證（使用者，2026-11-21，網路 ATM）**：付款後瀏覽器**自動導回** `http://localhost:3001` 的 `OrderResultURL`（綠界接受 localhost 回傳網址）、訂單頁自動查詢即變 `paid`。開發資料庫紀錄：`trade_status=1`、`payment_type=WebATM_LAND`、金額與訂單相符，付款後約 10 秒完成驗證。
+- **Playwright E2E（2026-11-23，網路 ATM／台灣土地銀行）**：付款頁的元素為 `li#liWebATM`、`select#selWebATMBank`、`a#WebATMPaySubmit`，按下後出現 simplert 提示框（關閉鈕 `#btnClose`）；土地銀行模擬頁 `MockMPPost/LandWebAtm` 按 `Save` 後，綠界顯示約 5 秒「交易資料傳輸中…」即自動 POST `OrderResultURL` 回站，**沒有**「付款成功／返回商店」頁；回站後自動查詢即為 `paid`。流程見 [../testing/e2e.md](../testing/e2e.md)。
 - **尚未驗證**：信用卡（含 3D 驗證）的付款成功回應與時間；離線付款（ATM 虛擬帳號、超商代碼、條碼）付款後查詢是否為 `1`（`WebATM_LAND` 是即時付款，不能代表離線方式）。測試帳號付款頁上的「測試付款請點此」會開啟需填卡號的模擬表單，不是一鍵付款。
 
 ## 已知限制
@@ -53,7 +54,7 @@
 - 沒有退款、對帳、發票；失敗的交易不會還原庫存。
 
 ## 綠界 skill
-`.claude/skills/ecpay` 以 **git submodule** 引用綠界官方 repo（`https://github.com/ECPay/ECPay-API-Skill.git`），只記錄指標、不複製內容：該 repo 授權為 All Rights Reserved，禁止重新散布。取得專案後執行 `git submodule update --init`，或 clone 時加 `--recurse-submodules`。`test/ecpay.test.js` 會讀取其中的 `test-vectors/checkmacvalue.json`，submodule 未初始化時略過該組測試。
+`.claude/skills/ecpay` 以 **git submodule** 引用綠界官方 repo（`https://github.com/ECPay/ECPay-API-Skill.git`），只記錄指標、不複製內容：該 repo 授權為 All Rights Reserved，禁止重新散布。取得專案後執行 `git submodule update --init`，或 clone 時加 `--recurse-submodules`。`test/unit/ecpay.test.js` 會讀取其中的 `test-vectors/checkmacvalue.json`，submodule 未初始化時略過該組測試。
 
 ## 上線前
 正式環境改用 `ECPAY_ENV=production` 與正式的 MerchantID／HashKey／HashIV（只放環境變數）；需要可公開存取的 https 網址與接收 Server Notify 的端點，並重新確認官方規格。

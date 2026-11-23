@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const source = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'pages', 'checkout.js'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '..', '..', 'public', 'js', 'pages', 'checkout.js'), 'utf8');
 
 // 載入頁面腳本（Vue 以假物件取代：ref 只保留 .value，computed 每次讀取時重新計算）。
 function loadPage({ user, apiFetch = vi.fn() }) {

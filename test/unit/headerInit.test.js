@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const file = path.join(__dirname, '..', 'public', 'js', 'header-init.js');
+const file = path.join(__dirname, '..', '..', 'public', 'js', 'header-init.js');
 const source = fs.readFileSync(file, 'utf8');
 
 // 最小的假 DOM：只實作 header-init.js 會用到的方法。

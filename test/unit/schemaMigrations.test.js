@@ -1,6 +1,6 @@
 // orders 運費欄位補欄位測試：自建獨立的記憶體資料庫模擬「功能上線前」的舊 schema，不使用 app 的資料庫。
 const Database = require('better-sqlite3');
-const { ORDER_SHIPPING_COLUMNS, addOrderShippingColumns } = require('../src/utils/schemaMigrations');
+const { ORDER_SHIPPING_COLUMNS, addOrderShippingColumns } = require('../../src/utils/schemaMigrations');
 
 const COLUMN_NAMES = ORDER_SHIPPING_COLUMNS.map((c) => c.name);
 
@@ -65,7 +65,7 @@ describe('addOrderShippingColumns（orders 運費欄位）', () => {
   });
 
   it('app 使用的資料庫已有運費欄位', () => {
-    const appDb = require('../src/database');
+    const appDb = require('../../src/database');
     expect(appDb.memory).toBe(true); // 與 test/setup.js 相同的安全閥：只檢查記憶體資料庫
     const names = appDb.prepare('PRAGMA table_info(orders)').all().map((c) => c.name);
     expect(names).toEqual(expect.arrayContaining(COLUMN_NAMES));

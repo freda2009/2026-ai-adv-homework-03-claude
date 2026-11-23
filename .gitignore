@@ -1,11 +1,15 @@
 # Dependencies
 node_modules/
 
-# Build output
-backend-project/public/css/output.css
+# Build output（npm run css:build 由 public/css/input.css 產生）
+public/css/output.css
 
+# 由 npm run openapi、npm run postman（及 auto-api-docs hook）產生的 OpenAPI 文件
+openapi.json
+# 由 npm run postman 產生的 Postman Collection（不提交，clone 後自行產生）
+/postman/
 
-# SQLite database files
+# SQLite database files（database.sqlite 含使用者資料；WAL 模式會另外產生 -shm／-wal）
 *.db
 *.sqlite
 *.sqlite3
@@ -16,6 +20,9 @@ backend-project/public/css/output.css
 .env
 .env.*
 !.env.example
+
+# Claude Code 本機設定（settings.local.json）
+.claude/*.local.json
 
 # OS files
 .DS_Store
@@ -29,34 +36,14 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# Test coverage
-coverage/
-
 # Temp files
 *.tmp
 *.swp
 
-.claude/*.local.json
-public/css/output.css
-
-# 由 npm run openapi（及 auto-api-docs hook）產生的 OpenAPI 文件
-openapi.json
-
-# 測試產物：影片、截圖、Trace、報告與暫存資料（Vitest、Playwright 等工具產生，不提交）
+# 測試產物（不提交）
+# Vitest 覆蓋率報告
+coverage/
+# Playwright（playwright.config.js）：失敗截圖、影片、trace.zip、E2E 成功截圖與綠界頁面傾印都在 test-results/
 /test-results/
+# Playwright HTML 報告
 /playwright-report/
-/blob-report/
-/playwright/.cache/
-/playwright/.auth/
-/html/
-/reports/
-junit*.xml
-/screenshots/
-/videos/
-/traces/
-*.webm
-trace.zip
-*.trace.zip
-/tmp/
-/temp/
-.tmp/

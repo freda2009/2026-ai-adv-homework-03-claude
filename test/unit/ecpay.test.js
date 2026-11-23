@@ -8,7 +8,7 @@ const {
   generateMerchantTradeNo,
   buildItemName,
   parseQueryResponse,
-} = require('../src/services/ecpay');
+} = require('../../src/services/ecpay');
 
 const HASH_KEY = 'pwFHCqoQZGmho4w6';
 const HASH_IV = 'EkRm7iFT261dpevs';
@@ -53,7 +53,7 @@ describe('generateCheckMacValue / verifyCheckMacValue', () => {
 
 // 官方測試向量位於 skill 的 repo（以 git submodule 引用，不複製進本專案）。
 // 檔案不存在時整組略過。
-const vectorFile = path.join(__dirname, '..', '.claude', 'skills', 'ecpay', 'test-vectors', 'checkmacvalue.json');
+const vectorFile = path.join(__dirname, '..', '..', '.claude', 'skills', 'ecpay', 'test-vectors', 'checkmacvalue.json');
 const hasVectors = fs.existsSync(vectorFile);
 const vectors = hasVectors
   ? JSON.parse(fs.readFileSync(vectorFile, 'utf8')).vectors.filter((v) => v.params && !v.formula)

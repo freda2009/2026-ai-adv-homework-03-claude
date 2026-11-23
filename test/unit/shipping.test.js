@@ -6,7 +6,7 @@ const {
   isValidSubtotal,
   calculateShipping,
   getShippingRates,
-} = require('../src/utils/shipping');
+} = require('../../src/utils/shipping');
 
 const HOME = SHIPPING_METHODS.HOME_DELIVERY;
 const STORE = SHIPPING_METHODS.CONVENIENCE_STORE;

@@ -33,7 +33,11 @@ npm start                 # 建置 CSS 並啟動，http://localhost:3001
 | `npm run dev:css` | Tailwind 監聽模式（輸出 `public/css/output.css`） |
 | `npm run css:build` | Tailwind 壓縮建置 |
 | `npm run openapi` | 產生 `openapi.json`（寫在專案根目錄） |
-| `npm test` | `vitest run`（測試在 `test/`） |
+| `npm run postman` | 產生 `openapi.json` 並轉成 `postman/flower-life.postman_collection.json`（不提交） |
+| `npm test` | unit＋integration（Vitest，記憶體資料庫） |
+| `npm run test:unit` | `test/unit` |
+| `npm run test:integration` | `test/integration`（supertest） |
+| `npm run test:e2e` | Playwright 測已啟動的站台與綠界付款（先 `npm start`） |
 
 ## 文件索引
 
@@ -44,6 +48,6 @@ npm start                 # 建置 CSS 並啟動，http://localhost:3001
 | [architecture/database.md](./architecture/database.md) | 資料表 schema、seed 資料 |
 | [DEVELOPMENT.md](./DEVELOPMENT.md) | 命名規則、環境變數、新增功能與計畫歸檔流程 |
 | [FEATURES.md](./FEATURES.md) | 功能總覽；細節見 [features/](./features/)（運費規則：[features/shipping.md](./features/shipping.md)） |
-| [TESTING.md](./TESTING.md) | 測試檔案、輔助函式、陷阱 |
+| [TESTING.md](./TESTING.md) | 測試指令、檔案、資料隔離；E2E 與 Postman 見 [testing/](./testing/) |
 | [CHANGELOG.md](./CHANGELOG.md) | 更新日誌 |
 | [plans/](./plans/) | 進行中計畫；已完成的在 `plans/archive/` |

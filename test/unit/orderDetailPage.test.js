@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const source = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'pages', 'order-detail.js'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '..', '..', 'public', 'js', 'pages', 'order-detail.js'), 'utf8');
 
 // 最小的假 DOM；innerHTML 設成會丟錯的 setter，確保腳本不會用字串組 HTML。
 function makeEl(tag) {

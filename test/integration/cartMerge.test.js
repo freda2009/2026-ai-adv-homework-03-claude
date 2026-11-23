@@ -1,6 +1,6 @@
 const { app, request, registerUser } = require('./setup');
-const db = require('../src/database');
-const cartService = require('../src/services/cartService');
+const db = require('../../src/database');
+const cartService = require('../../src/services/cartService');
 
 describe('登入／註冊時合併訪客購物車', () => {
   let productA;

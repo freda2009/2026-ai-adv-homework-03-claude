@@ -3,8 +3,11 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     globals: true,
+    // 只收 unit 與 integration；test/e2e 是 Playwright（npm run test:e2e），不可被 Vitest 執行。
+    include: ['test/unit/**/*.test.js', 'test/integration/**/*.test.js'],
+    exclude: ['test/e2e/**', 'node_modules/**'],
     // 測試環境變數：使用記憶體資料庫，且不依賴 .env（dotenv 不會覆寫既有環境變數）。
-    // ADMIN_* 需與 test/setup.js 的 getAdminToken() 一致。
+    // ADMIN_* 需與 test/integration/setup.js 的 getAdminToken() 一致。
     env: {
       DB_PATH: ':memory:',
       JWT_SECRET: 'test-only-jwt-secret',
@@ -21,12 +24,12 @@ export default defineConfig({
     fileParallelism: false,
     sequence: {
       files: [
-        'test/auth.test.js',
-        'test/products.test.js',
-        'test/cart.test.js',
-        'test/orders.test.js',
-        'test/adminProducts.test.js',
-        'test/adminOrders.test.js',
+        'test/integration/auth.test.js',
+        'test/integration/products.test.js',
+        'test/integration/cart.test.js',
+        'test/integration/orders.test.js',
+        'test/integration/adminProducts.test.js',
+        'test/integration/adminOrders.test.js',
       ],
     },
     hookTimeout: 10000,

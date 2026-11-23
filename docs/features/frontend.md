@@ -43,5 +43,5 @@
 ## 已知陷阱
 
 - 新增「帳密驗證型」的端點（回 401 但不代表登入過期）時，要比照登入／註冊，把它加進 `api.js` 的 `isCredentialRequest` 判斷，否則會被導向 `/login`。
-- 前端腳本沒有瀏覽器測試環境；`test/apiFetch.test.js`、`test/headerInit.test.js`、`test/checkoutPage.test.js` 等以 Node `vm` 注入假的 DOM 與 `fetch` 驗證邏輯，不等於瀏覽器實機驗證。
+- 前端單元測試（`test/unit/apiFetch.test.js`、`headerInit`、`checkoutPage`、`orderDetailPage`）以 Node `vm` 注入假的 DOM 與 `fetch` 驗證邏輯；瀏覽器實際操作由 Playwright E2E（`npm run test:e2e`，見 [../testing/e2e.md](../testing/e2e.md)）涵蓋登入、購物車、結帳與綠界付款。
 - Tailwind 的自訂色（`rose-primary`、`sage`、`apricot`、`cream` 等）定義在 `public/css/input.css` 的 `@theme`；新增樣式後必須重新 `npm run css:build`（或開 `dev:css`）。

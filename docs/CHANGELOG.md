@@ -2,6 +2,17 @@
 
 格式：新的在上。每項功能完成並歸檔計畫時，在此新增一筆，並連結到 `plans/archive/` 的計畫。
 
+## 2026-11-23
+
+### 測試：完整測試流程（Integration、E2E、Postman）
+- 測試分成 `test/unit`、`test/integration`、`test/e2e`；新增 `npm run test:unit`、`test:integration`、`test:e2e`、`postman`（`npm test` 仍執行 unit＋integration）。
+- **Integration**：新增 `test/integration/checkoutFlow.test.js`（9）與 `testData.js`：每個測試自建會員、自清資料並還原庫存；檢查回應格式、`orders`／`order_items` 寫入、運費與總額、庫存扣除、購物車清空，以及失敗時（含以 trigger 模擬交易中途失敗）不留訂單、不扣庫存。實測執行前後 `database.sqlite` 雜湊值不變。
+- **E2E**：Playwright 1.65.0（系統 Chrome，不設定 `webServer`），以管理員登入 → 加入購物車 → 宅配＋當日急件結帳 → 綠界測試環境網路 ATM（台灣土地銀行）付款 → 回站顯示「已付款」、API 為 `paid`，並存成功截圖。實測綠界付款後會自動以 `OrderResultURL` 返回商店，沒有「返回商店」按鈕，測試兩種情況都支援。
+- **Postman**：`scripts/generate-postman.js` 以 openapi-to-postmanv2 6.4.2 產生 `postman/flower-life.postman_collection.json`（已 gitignore，不提交；`{{baseUrl}}`、`token`、`sessionId`；Bearer 繼承、登入／註冊自動存 token、購物車帶 `X-Session-Id`；移除亂數範例回應讓輸出穩定）。`postmanCollection.test.js`（7）由目前路由在記憶體產生 collection 並檢查結構。
+- 測試總數：Vitest 185（unit 89、integration 96）＋ E2E 1。
+- 文件：新增 [testing/e2e.md](./testing/e2e.md)、[testing/postman.md](./testing/postman.md)，改寫 TESTING.md。
+- 計畫：[test-pipeline](./plans/archive/2026-11-23-test-pipeline.md)
+
 ## 2026-11-22
 
 ### 新功能：配送費用（Shipping 模組）
